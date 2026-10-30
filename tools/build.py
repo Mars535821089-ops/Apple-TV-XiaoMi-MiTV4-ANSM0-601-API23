@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import os
 from pathlib import Path
@@ -81,7 +82,8 @@ def main() -> int:
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--unsigned', action='store_true')
     parser.add_argument('--label', default='audit11-rebuild')
-    parser.add_argument('--input-probe', choices=['consumer-menu'],
+    probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe'}
+    parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
     if args.input_probe and args.label == 'audit11-rebuild':
@@ -116,7 +118,7 @@ def main() -> int:
         shutil.copy2(source, target)
     if args.input_probe:
         sys.path.insert(0, str(ROOT / 'experiments'))
-        from consumer_menu_probe import smali_probe
+        smali_probe = importlib.import_module(probes[args.input_probe]).smali_probe
         keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
         keys.write_text(smali_probe(keys.read_text()))
     raw = work / 'CarCast-0.3.25-cn-unsigned.apk'
@@ -134,7 +136,7 @@ def main() -> int:
         '--output', candidate)
     if args.input_probe:
         probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
-        run(sys.executable, ROOT / 'experiments/consumer_menu_probe.py',
+        run(sys.executable, ROOT / 'experiments' / (probes[args.input_probe] + '.py'),
             '--source', candidate, '--output', probe)
         probe.replace(candidate)
     resources = verify_resources(upstream, candidate)

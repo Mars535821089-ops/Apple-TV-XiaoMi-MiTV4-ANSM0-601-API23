@@ -14,3 +14,5 @@
 `consumer_menu_probe.py`以F2/F3/F4/F5发送Consumer Menu上/下/左/右；仅诊断iPhone是否接受这种输入，未证实兼容，不替代完整遥控器适配。可通过正常构建命令附加`--input-probe consumer-menu --label consumer-menu-probe`重建；必须使用独立标签以保留基线。对应标准来源：https://www.usb.org/sites/default/files/hut1_21_0.pdf 和 https://source.android.com/docs/core/interaction/input/keyboard-devices 。
 
 实机结果：Consumer Menu候选无线画面及媒体音轨可建立，但独立方向指令和原旋钮对照均未产生预期焦点变化；不作为可用输入方案。media_queue_probe出现新增音轨欠载，未获得同步改善确认，已撤回其缓冲改动。
+
+`additive_menu_probe.py`是后续隔离诊断：保留所有既有按钮、X/Y及wheel的位置，仅把原报告bit4..7的空白位改为Consumer Menu四方向。描述符放在本项目原生桥的既有文件填充中，RX映射从104扩为180字节；报告仍为32bit，不新增可写可执行映射。固定偏移、原始字节、完整字段对照、两个ASLR基址的分配复制检查通过。`--input-probe additive-menu --label additive-menu-probe`可构建。F2/F3/F4/F5依次为上/下/左/右，实体遥控器映射尚未修改。手机是否接受该字段仍未实测，不能称为修复。
