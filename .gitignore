@@ -1,0 +1,17 @@
+local/
+build/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.apk
+*.dex
+*.so
+*.idsig
+*.keystore
+*.jks
+*.log
+*.jsonl
+.env
+.env.*
+device.local.json

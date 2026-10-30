@@ -1,0 +1,388 @@
+--- a/smali/ai/rplay/carcast/CarPlayActivity.smali
++++ b/smali/ai/rplay/carcast/CarPlayActivity.smali
+@@ -27,4 +27,10 @@
+ 
+ .field public f:Z
++
++.field public cnCursor:Landroid/widget/TextView;
++
++.field public cnX:F
++
++.field public cnY:F
+ 
+ 
+@@ -747,4 +753,6 @@
+     invoke-virtual {p0, v4}, Landroid/app/Activity;->setContentView(Landroid/view/View;)V
+ 
++    invoke-static {p0}, Lai/rplay/carcast/CnRender;->attach(Lai/rplay/carcast/CarPlayActivity;)V
++
+     .line 228
+     .line 229
+@@ -2123,4 +2131,11 @@
+     .locals 1
+ 
++    invoke-static {p0, p1, p2}, Lai/rplay/carcast/CnKeys;->handle(Lai/rplay/carcast/CarPlayActivity;ILandroid/view/KeyEvent;)Z
++    move-result v0
++    if-eqz v0, :original_keys
++    const/4 v0, 0x1
++    return v0
++    :original_keys
++
+     .line 1
+     const/4 v0, 0x4
+@@ -2152,4 +2167,17 @@
+     .line 13
+     return p1
++.end method
++
++.method public onKeyUp(ILandroid/view/KeyEvent;)Z
++    .locals 1
++    invoke-static {p0, p1, p2}, Lai/rplay/carcast/CnKeys;->handle(Lai/rplay/carcast/CarPlayActivity;ILandroid/view/KeyEvent;)Z
++    move-result v0
++    if-eqz v0, :original_key_up
++    const/4 v0, 0x1
++    return v0
++    :original_key_up
++    invoke-super {p0, p1, p2}, Landroid/app/Activity;->onKeyUp(ILandroid/view/KeyEvent;)Z
++    move-result v0
++    return v0
+ .end method
+ 
+@@ -2347,5 +2375,5 @@
+ 
+     .line 6
+-    invoke-static {v1, v0}, Lai/rplay/carcast/NativeBridge;->setScreenSurface(ILandroid/view/Surface;)V
++    invoke-static {v1, v0}, Lai/rplay/carcast/CnRender;->route(ILandroid/view/Surface;)V
+ 
+     .line 7
+@@ -2378,5 +2406,5 @@
+ 
+     .line 3
+-    invoke-static {p1, v0}, Lai/rplay/carcast/NativeBridge;->setScreenSurface(ILandroid/view/Surface;)V
++    invoke-static {p1, v0}, Lai/rplay/carcast/CnRender;->route(ILandroid/view/Surface;)V
+ 
+     .line 4
+--- a/smali/ai/rplay/carcast/CarPlayService.smali
++++ b/smali/ai/rplay/carcast/CarPlayService.smali
+@@ -4764,4 +4764,6 @@
+ 
+     .line 74
++    invoke-static {p0}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V
++
+     .line 75
+     const-string p3, "carcast"
+--- a/smali/ai/rplay/carcast/FlingActivity.smali
++++ b/smali/ai/rplay/carcast/FlingActivity.smali
+@@ -99,5 +99,5 @@
+     .line 9
+     :goto_0
+-    invoke-virtual {v0, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, v1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 10
+@@ -508,5 +508,5 @@
+     .line 174
+     .line 175
+-    invoke-virtual {v0, v2}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, v2}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 176
+@@ -593,5 +593,5 @@
+     .line 221
+     .line 222
+-    invoke-virtual {v0, v1}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v0, v1}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 223
+--- a/smali/ai/rplay/carcast/NativeBridge.smali
++++ b/smali/ai/rplay/carcast/NativeBridge.smali
+@@ -561,4 +561,7 @@
+ .method public static onCarPlayEnded()V
+     .locals 3
++
++    sget-object v0, Lai/rplay/carcast/CarPlayService;->A:Lai/rplay/carcast/CarPlayService;
++    invoke-static {v0}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V
+ 
+     .line 1
+--- a/smali/ai/rplay/carcast/SettingsActivity.smali
++++ b/smali/ai/rplay/carcast/SettingsActivity.smali
+@@ -885,5 +885,5 @@
+     .line 5
+     .line 6
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 7
+@@ -1092,5 +1092,5 @@
+     :cond_3
+     :goto_0
+-    invoke-virtual {v1, v2}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v1, v2}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 49
+@@ -1374,5 +1374,5 @@
+     .line 178
+     :goto_5
+-    invoke-virtual {v10, v11}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v10, v11}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 179
+@@ -1737,5 +1737,5 @@
+     :cond_1c
+     :goto_6
+-    invoke-virtual {v12, v0}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v12, v0}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 353
+@@ -1866,5 +1866,5 @@
+ 
+     .line 420
+-    invoke-virtual {v0, v7}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, v7}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 421
+@@ -1893,5 +1893,5 @@
+     .line 432
+     :goto_7
+-    invoke-virtual {v0, v7}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, v7}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 433
+@@ -2076,5 +2076,5 @@
+     .line 520
+     .line 521
+-    invoke-virtual {v0, v2}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, v2}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 522
+@@ -3214,5 +3214,5 @@
+     .line 467
+     .line 468
+-    invoke-virtual {v7, v10}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v7, v10}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 469
+@@ -4451,5 +4451,5 @@
+     .line 214
+     .line 215
+-    invoke-virtual {p1, v1}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {p1, v1}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 216
+@@ -4764,5 +4764,5 @@
+     .line 161
+     .line 162
+-    invoke-virtual {v0, p1}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 163
+@@ -5644,5 +5644,5 @@
+     aget-object v10, v8, v17
+ 
+-    invoke-virtual {v9, v10}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v9, v10}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     const v10, -0xd0b06
+@@ -5991,5 +5991,5 @@
+     invoke-direct {v3, v0, v2, v8}, Ljw;-><init>(Lai/rplay/carcast/SettingsActivity;Ljava/lang/Object;I)V
+ 
+-    invoke-virtual {v2, v3}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v2, v3}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 121
+@@ -6436,5 +6436,5 @@
+     invoke-direct {v6, v0, v8}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v5, v6}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v5, v6}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 180
+@@ -6487,5 +6487,5 @@
+     invoke-direct {v9, v0, v10}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v6, v9}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v6, v9}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 187
+@@ -6503,5 +6503,5 @@
+     invoke-direct {v10, v0, v11}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v9, v10}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v9, v10}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 189
+@@ -6924,5 +6924,5 @@
+     invoke-direct {v6, v8, v2}, Lyq;-><init>(ILjava/lang/Object;)V
+ 
+-    invoke-virtual {v5, v6}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v5, v6}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 241
+@@ -7694,5 +7694,5 @@
+     invoke-direct {v4, v0, v8}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v3, v4}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v3, v4}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 318
+@@ -7710,5 +7710,5 @@
+     invoke-direct {v5, v0, v6}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v4, v5}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v4, v5}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 320
+@@ -8212,5 +8212,5 @@
+     invoke-direct {v2, v0, v5}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v1, v2}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v1, v2}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 365
+@@ -8352,5 +8352,5 @@
+     invoke-direct {v5, v0, v8}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v4, v5}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v4, v5}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 380
+@@ -8929,5 +8929,5 @@
+     invoke-direct {v2, v0, v5}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v4, v2}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v4, v2}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 440
+@@ -9025,5 +9025,5 @@
+     invoke-direct {v5, v0, v8}, Lxv;-><init>(Lai/rplay/carcast/SettingsActivity;I)V
+ 
+-    invoke-virtual {v2, v5}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v2, v5}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 452
+@@ -9063,5 +9063,5 @@
+     invoke-direct {v4, v0, v14}, Lai/rplay/carcast/k;-><init>(Landroid/app/Activity;I)V
+ 
+-    invoke-virtual {v2, v4}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v2, v4}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 456
+@@ -9277,5 +9277,5 @@
+     .line 4
+     .line 5
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 6
+@@ -9393,5 +9393,5 @@
+     .line 5
+     .line 6
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 7
+@@ -9467,5 +9467,5 @@
+ 
+     .line 13
+-    invoke-virtual {p1, v0}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {p1, v0}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 14
+@@ -9780,5 +9780,5 @@
+     .line 132
+     .line 133
+-    invoke-virtual {v0, p5}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v0, p5}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 134
+@@ -10510,5 +10510,5 @@
+     .line 294
+     .line 295
+-    invoke-virtual {v6, v7}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v6, v7}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 296
+@@ -10741,5 +10741,5 @@
+     .line 19
+     .line 20
+-    invoke-virtual {v1, v2}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v1, v2}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 21
+@@ -10858,5 +10858,5 @@
+     .line 29
+     .line 30
+-    invoke-virtual {v2, v3}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v2, v3}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 31
+@@ -10886,5 +10886,5 @@
+     .line 43
+     .line 44
+-    invoke-virtual {p1, p2}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {p1, p2}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 45
+@@ -11408,5 +11408,5 @@
+     .line 5
+     .line 6
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 7
+@@ -11635,5 +11635,5 @@
+     .line 5
+     .line 6
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 7
+@@ -11784,4 +11784,6 @@
+ .method public final j(Ljava/lang/String;)V
+     .locals 3
++
++    invoke-static {p0, p1}, Lai/rplay/carcast/CnReconnect;->remember(Landroid/content/Context;Ljava/lang/String;)V
+ 
+     .line 1
+@@ -12559,5 +12561,5 @@
+     .line 5
+     .line 6
+-    invoke-virtual {v0, p1}, Landroid/widget/TextView;->setHint(Ljava/lang/CharSequence;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->hint(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 7
+@@ -12942,4 +12944,6 @@
+     invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
+ 
++    invoke-static {p0}, Lai/rplay/carcast/CnRemote;->configure(Landroid/content/Context;)V
++
+     .line 2
+     .line 3
+@@ -13730,5 +13734,5 @@
+ 
+     .line 23
+-    invoke-virtual {p1, p3}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {p1, p3}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 24
+@@ -15356,5 +15360,5 @@
+     .line 25
+     :goto_0
+-    invoke-virtual {p1, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
++    invoke-static {p1, v1}, Lai/rplay/carcast/CnUi;->text(Landroid/widget/TextView;Ljava/lang/CharSequence;)V
+ 
+     .line 26
+@@ -15534,5 +15538,5 @@
+     .line 74
+     .line 75
+-    invoke-virtual {v3, v1}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v3, v1}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 76
+@@ -15573,5 +15577,5 @@
+     .line 95
+     .line 96
+-    invoke-virtual {v0, p1}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
++    invoke-static {v0, p1}, Lai/rplay/carcast/CnUi;->click(Landroid/view/View;Landroid/view/View$OnClickListener;)V
+ 
+     .line 97

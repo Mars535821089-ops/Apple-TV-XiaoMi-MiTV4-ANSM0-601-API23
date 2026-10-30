@@ -1,0 +1,70 @@
+# Carplay-XiaoMi MiTV4-ANSM0-601-API23
+
+小米 MiTV4-ANSM0（Android 6.0.1 / API23 / ARM32）的电视 CarPlay 适配补丁、构建工具和实机验收记录。
+
+**开发中，尚未完成全方位适配。audit11 的上下键可能横移，不是最终交付版本。**
+
+已确认：中文接收页面、16:9无线主画面、Aerial桌面、一次真实重启后自动进入Aerial，及用户确认的电视出声。仍未完成：真实四向、跨应用全部按钮、Siri、杂音与长期稳定性。详见 [完整验收矩阵](docs/ACCEPTANCE.md)。
+
+## 源码与第三方基线
+
+- `src/carcast/`：本项目新增Smali适配代码及5个原厂类的最小钩子补丁。
+- `tools/`：构建、已授权电视的部署/按键与普通实时预览工具。
+- `experiments/`：未通过验收的历史实验；**不进入默认构建**。特别是交互PCM限制已撤回。
+- `dependencies.lock.json`：原厂APK和工具的官方来源与固定SHA256。
+- `local/`：仅本地保存的运行材料、上游应用解包目录和设备记录，全部被Git忽略。
+
+CarCast是闭源第三方基线，本仓库不包含其完整反编译代码、APK或原生库。构建从[原厂公开发布](https://github.com/rPlayAI/carcast-public/releases/tag/android-0.3.25)获取基线，仅重现本项目补丁。保留原测试期限 **2027-01-19** 及认证逻辑。本项目不是原厂发行版，不表示与Apple、小米或CarCast原厂有关联。
+
+## 构建
+
+已验证的构建环境：macOS、Python 3.12.4、Java 21、Xcode命令行工具中的clang。安装 `uv` 后：
+
+```sh
+uv run --no-project --python 3.12.4 \
+  --with capstone==5.0.9 --with pyelftools==0.33 --with unicorn==2.1.4 \
+  python tools/build.py
+```
+
+Java需要在PATH中，或传 `--java /path/to/java`。原生桥接汇编使用 `xcrun clang`；其他平台尚未验收。输出在 `build/outputs/`，包含签名候选和SHA256构建回执。签名使用uber-apk-signer自带的测试签名，不在源码中存放私钥。
+
+`--offline` 禁止下载；可用 `--upstream-apk`、`--apktool`、`--signer` 指定已有文件，仍会核对固定SHA256。大小写仅不同的原厂资源直接从原始ZIP保留，避免macOS文件系统碰撞。
+
+2026-10-31 已用本仓库源码从干净原厂基线完成重建；签名APK SHA256与电视当前audit11字节完全一致：`8a21cc7db6ea0499862385fab03d49b45d43654e3f7d0c172d983ab2ff068518`。这证明构建可重现，不代表audit11的方向问题已经解决。
+
+## 已授权电视部署
+
+首次连接需在电视上开启ADB调试并允许该电脑；Wi-Fi密码只在电视上输入。地址由本地环境提供，不写入公开源码：
+
+```sh
+export TV_SERIAL='电视IP:5555'
+adb -P 5040 connect "$TV_SERIAL"
+python3 tools/device.py status
+python3 tools/device.py install \
+  --apk build/outputs/CarCast-0.3.25-audit11-rebuild-aligned-debugSigned.apk \
+  --receipt build/outputs/audit11-rebuild.json
+python3 tools/device.py launch carcast
+```
+
+工具先核对设备型号、API和ABI；覆盖安装使用`install -r`保留数据，并核对设备安装包字节一致。不自动卸载，不清除配对，不修改Wi-Fi、代理或路由。第一次配对和手机端权限仍应在设备正常界面完成。安装通过不等于功能验收通过。
+
+```sh
+python3 tools/device.py remote right ok back
+python3 tools/device.py launch aerial
+python3 tools/preview.py
+```
+
+实时预览使用普通800×450窗口，不全屏，不生成截图或录像，不捕获电视音频。`SCRCPY_BINARY` / `ADB_BINARY` 可指向已有工具；本机验证使用scrcpy5.0.1。不要同时打开多个预览实例。
+
+## 回退与验收
+
+保留已知可用的本地同签名候选，以相同部署方式覆盖回退；不要通过卸载来回退。原厂签名与本地测试签名不同，不能直接互相覆盖，涉及卸载清数据时须另行处理。
+
+完整状态见 [计划](task_plan.md)、[研究证据](findings.md)、[执行记录](progress.md) 和 [验收矩阵](docs/ACCEPTANCE.md)。ADB持续开启、重启后保留已有电脑授权由用户指定为**最终验收关卡**，目前不宣称通过。
+
+```sh
+python3 -m unittest discover -s tests -v
+python3 tools/check_public_sources.py
+```
+
+边界测试与原生指令仿真不能代替真实电视、手机和实体遥控器验收。
