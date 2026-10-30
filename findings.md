@@ -30,3 +30,8 @@
 - https://github.com/luka-dev/mib2q-carplay-rgi/blob/main/java_patch/com/luka/carplay/input/TouchpadController.java
 
 - 恢复audit11后模拟遥控器播放媒体，实机日志确认MainHighAudio102 / AAC-LC 44100Hz双声道，手机请求audioLatencyMs=1000；这是媒体缓冲参数，不等于已测得端到端总延迟。Android活动音轨为CarCast进程，fCount=3776，不能将其与1000ms协议缓冲混为一谈。
+
+- media_queue_probe已在实机建立MainHighAudio102及活动AudioTrack；手机仍请求1000ms，实验仅改变接收端初始目标，不能称为完成延迟协商。已观察音轨欠载计数从2329增至3273，原因尚未隔离；不能宣称无杂音或已同步。
+- Consumer Menu方向Usage 0x42/43/44/45已由USB-IF与AOSP官方表确认；CarPlay是否接受该报告仍属假设。诊断版本仅添加F2至F5别名，不修改实体遥控器的现有映射。
+
+- Consumer Menu实机对照：Right/Down诊断报告已发出，网格仍停在首个电话图标；旋钮wheel也未产生预期移动，但Home按钮仍能从仪表板回到应用网格。不能据此声称整套HID被拒绝；本候选仍不满足导航要求，已启动audit11回退。后续若研究附加方向字段，应保留原X/Y布局作为对照，避免移除原字段导致解释混杂。

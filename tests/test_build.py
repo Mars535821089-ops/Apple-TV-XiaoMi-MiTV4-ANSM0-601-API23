@@ -3,6 +3,8 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+import contextlib
+import io
 from unittest.mock import patch
 from zipfile import ZipFile
 
@@ -12,6 +14,14 @@ SPEC.loader.exec_module(build)
 
 
 class BuildBoundaryTests(unittest.TestCase):
+    def test_probe_cannot_overwrite_the_baseline_label(self):
+        with patch('sys.argv', ['build.py', '--input-probe', 'consumer-menu']), contextlib.redirect_stderr(io.StringIO()):
+            with patch.object(build, 'artifact') as artifact:
+                with self.assertRaises(SystemExit) as error:
+                    build.main()
+                self.assertEqual(error.exception.code, 2)
+                artifact.assert_not_called()
+
     def test_poisoned_cache_is_not_silently_trusted(self):
         with tempfile.TemporaryDirectory() as folder:
             cache = Path(folder)

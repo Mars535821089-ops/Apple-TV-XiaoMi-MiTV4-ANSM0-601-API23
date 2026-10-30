@@ -8,3 +8,9 @@
 - `low_latency_media.py`：**本机实测失败，已安排回退，不作为可用修复**。该实验在MainAudio100媒体路径声明已有AAC-LC格式，移除MainHigh102和缓冲103能力及mainBuffered token。无线画面可连接，QQ音乐显示播放且进度前进，但CarCast没有播放AudioTrack，也没有媒体音频SETUP。不能以画面或播放按钮正常判定音频可用。它不修改认证、到期时间或手机视频时间戳；仅保留失败研究源码。
 
 实验结果与失败项保留在验收记录；不要把实验候选称为修复完成版。
+
+`media_queue_probe.py`是独立的接收媒体队列实验，保留原有全部格式和通道，将type102/103初始化目标改为200ms；手机仍请求原延迟，不能称为已协商低延迟或同步修复。8项原始Thumb换算仿真通过，默认构建不使用。需观察实际音频、断音、延迟与恢复后决定保留或回退。
+
+`consumer_menu_probe.py`以F2/F3/F4/F5发送Consumer Menu上/下/左/右；仅诊断iPhone是否接受这种输入，未证实兼容，不替代完整遥控器适配。可通过正常构建命令附加`--input-probe consumer-menu --label consumer-menu-probe`重建；必须使用独立标签以保留基线。对应标准来源：https://www.usb.org/sites/default/files/hut1_21_0.pdf 和 https://source.android.com/docs/core/interaction/input/keyboard-devices 。
+
+实机结果：Consumer Menu候选无线画面及媒体音轨可建立，但独立方向指令和原旋钮对照均未产生预期焦点变化；不作为可用输入方案。media_queue_probe出现新增音轨欠载，未获得同步改善确认，已撤回其缓冲改动。

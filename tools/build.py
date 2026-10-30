@@ -81,7 +81,11 @@ def main() -> int:
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--unsigned', action='store_true')
     parser.add_argument('--label', default='audit11-rebuild')
+    parser.add_argument('--input-probe', choices=['consumer-menu'],
+                        help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
+    if args.input_probe and args.label == 'audit11-rebuild':
+        parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
     lock = json.loads((ROOT / 'dependencies.lock.json').read_text())
@@ -110,6 +114,11 @@ def main() -> int:
         target = decoded / source.relative_to(ROOT / 'src/carcast')
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+    if args.input_probe:
+        sys.path.insert(0, str(ROOT / 'experiments'))
+        from consumer_menu_probe import smali_probe
+        keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
+        keys.write_text(smali_probe(keys.read_text()))
     raw = work / 'CarCast-0.3.25-cn-unsigned.apk'
     run(args.java, '-jar', apktool, 'b', decoded, '-o', raw)
     stages = ['assemble_carcast_cn.py', 'fix_carcast_arm_alignment.py',
@@ -123,6 +132,11 @@ def main() -> int:
     candidate = output / f'CarCast-0.3.25-{args.label}-unsigned.apk'
     run(sys.executable, work / stages[-1], '--source', work / 'CarCast-0.3.25-cn-knob-unsigned.apk',
         '--output', candidate)
+    if args.input_probe:
+        probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
+        run(sys.executable, ROOT / 'experiments/consumer_menu_probe.py',
+            '--source', candidate, '--output', probe)
+        probe.replace(candidate)
     resources = verify_resources(upstream, candidate)
     final = candidate
     if signer is not None:
@@ -132,6 +146,7 @@ def main() -> int:
             raise FileNotFoundError('Signer did not produce the expected APK')
         verify_resources(upstream, final)
     receipt = {'label': args.label, 'apk': final.name, 'sha256': digest(final),
+               'input_probe': args.input_probe,
                'upstream_sha256': digest(upstream), 'resources_preserved': resources,
                'original_audio_capabilities': True, 'device_acceptance': 'not implied by build'}
     (output / f'{args.label}.json').write_text(json.dumps(receipt, indent=2) + '\n')

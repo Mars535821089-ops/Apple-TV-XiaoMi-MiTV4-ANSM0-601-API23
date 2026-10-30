@@ -25,3 +25,10 @@
 - 安装超时状态核对回归先复现失败后修复；新增verify-install只读核对入口。14项测试通过。
 - Aerial1.72官方源码已以固定提交子模块纳入；后续clone需带--recurse-submodules。
 - 恢复基线后播放媒体，实机MainHighAudio102请求audioLatencyMs=1000；确认仍走原厂AAC-LC通道，继续研究接收端延迟，尚未宣称同步修复。
+
+- media_queue_probe签名SHA256 7c319a474f61cfaa1315a165d1b2e657f4b8d2c7cd34db49066835b41ab88203 已覆盖安装并核对字节，数据和配对保留；遥控选择原配对手机后无线画面与AAC-LC音轨建立。8项队列换算仿真通过；没有实际手机声画同步确认。
+- Consumer Menu独立方向诊断候选构建完成，SHA256 c3b78145b59decfc7bf5ef82322c9cd6f6aa14c8498167e9aa4bcabe2d5b8583，原资源568项保留，分配复制4例通过；准备实测，默认构建继续保持audit11。
+
+- Consumer Menu候选已核对安装包字节并恢复无线会话，媒体音轨建立，音频已回到原缓冲设置；独立Right/Down及原wheel对照均未出现预期焦点变化。该候选判定失败，准备恢复audit11。默认版本在新增诊断开关后再次构建，SHA256仍为8a21cc7d，16项边界测试通过。
+
+- Consumer Menu额外对照：Home按钮可以回到应用网格，网格中的独立Right仍不动；不是全部HID都失效。此前仪表板一次wheel无响应不能推断整体描述被拒绝。已启动audit11覆盖回退，保留数据与原配对。
