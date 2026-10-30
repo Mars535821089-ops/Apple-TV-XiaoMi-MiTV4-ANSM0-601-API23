@@ -36,6 +36,8 @@ class TargetAndInstallTests(unittest.TestCase):
                     timed_out = error
                 self.assertIsNone(timed_out, 'A client timeout must not hide a completed TV installation')
                 self.assertEqual(sum(call.args[0] == 'install' for call in tv.run.call_args_list), 1)
+                install_call = next(call for call in tv.run.call_args_list if call.args[0] == 'install')
+                self.assertIsNone(install_call.kwargs['timeout'], 'Do not kill a transport awaiting TV confirmation')
 
     def test_other_device_is_rejected_before_mutation(self):
         tv = device.TV('test-target')

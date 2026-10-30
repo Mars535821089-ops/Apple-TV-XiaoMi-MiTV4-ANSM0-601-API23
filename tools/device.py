@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bounded ADB operations for the explicitly selected, already authorized TV."""
+"""ADB operations for one authorized TV; installation waits for its confirmation."""
 from __future__ import annotations
 
 import argparse
@@ -24,7 +24,7 @@ class TV:
             raise ValueError('Provide one explicit ADB serial, without whitespace')
         self.prefix = [adb, '-P', str(server_port), '-s', serial]
 
-    def run(self, *args: str, timeout: int = 15) -> str:
+    def run(self, *args: str, timeout: int | None = 15) -> str:
         result = subprocess.run(self.prefix + list(args), capture_output=True,
                                 text=True, errors='replace', timeout=timeout, check=True)
         return result.stdout.strip()
@@ -91,7 +91,9 @@ def main() -> None:
         client_timeout = False
         if args.action == 'install':
             try:
-                tv.run('install', '-r', str(args.apk.resolve()), timeout=180)
+                # Keep this foreground client alive while the TV asks for
+                # confirmation. A host deadline must not orphan that dialog.
+                tv.run('install', '-r', str(args.apk.resolve()), timeout=None)
             except subprocess.TimeoutExpired:
                 # The package manager may finish after the host client exits.
                 # Never retry a mutation on the strength of that timeout alone.
