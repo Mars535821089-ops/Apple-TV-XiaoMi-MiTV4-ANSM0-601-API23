@@ -1,0 +1,3 @@
+[submodule "upstream/aerial-tv"]
+	path = upstream/aerial-tv
+	url = https://github.com/pengchujin/aerial-tv.git

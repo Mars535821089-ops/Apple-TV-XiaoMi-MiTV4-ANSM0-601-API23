@@ -20,6 +20,11 @@ class PublicSourceBoundaryTests(unittest.TestCase):
     def test_normal_helper_source_is_accepted(self):
         self.assertEqual(policy.inspect_entry('tools/example.py', b'print("ready")\n'), [])
 
+    def test_only_named_source_submodule_can_be_considered(self):
+        commit = b'b8e12bcf0175c8e8f6ede546d92210ff8ce5841f'
+        self.assertEqual(policy.inspect_entry('upstream/aerial-tv', commit, '160000'), [])
+        self.assertTrue(policy.inspect_entry('upstream/unknown', commit, '160000'))
+
 
 if __name__ == '__main__':
     unittest.main()

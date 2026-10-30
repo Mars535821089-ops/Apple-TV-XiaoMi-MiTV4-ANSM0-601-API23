@@ -12,6 +12,7 @@
 - 用户已确认电视出声；不能据此宣称无杂音、语音或全链路音频通过。
 - 用户进一步确认：iPhone上播放视频，声音由电视输出，声音明显滞后。实际日志出现 MainHighAudio(102) 流结束；需要检查协商与播放缓冲，尚不能断言是特定固定毫秒数或已经修复。
 - 新源码构建已重现与设备相同的签名APK SHA256；公开仓库已创建并推送，GitHub REST确认visibility=public。
+- 低延迟旧媒体路径实验在本机失败：视频会话可建立，媒体UI播放，但没有电视音频通道。不能通过移除102/103能力来换取表面上的低延迟；恢复audit11继续研究。
 
 ## 研究线索（不是本机验收）
 
@@ -27,3 +28,5 @@
 - https://developer.apple.com/videos/play/wwdc2016/722/
 - https://github.com/serein-morii/DiPlay-CN/blob/main/common/src/main/java/com/shilapi/xcertplay/CarPlayRemoteKeys.kt
 - https://github.com/luka-dev/mib2q-carplay-rgi/blob/main/java_patch/com/luka/carplay/input/TouchpadController.java
+
+- 恢复audit11后模拟遥控器播放媒体，实机日志确认MainHighAudio102 / AAC-LC 44100Hz双声道，手机请求audioLatencyMs=1000；这是媒体缓冲参数，不等于已测得端到端总延迟。Android活动音轨为CarCast进程，fCount=3776，不能将其与1000ms协议缓冲混为一谈。

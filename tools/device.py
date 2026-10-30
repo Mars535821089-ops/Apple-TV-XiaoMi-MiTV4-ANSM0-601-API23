@@ -66,9 +66,10 @@ def main() -> None:
     remote.add_argument('keys', choices=KEYS, nargs='+')
     launch = sub.add_parser('launch')
     launch.add_argument('app', choices=COMPONENTS)
-    install = sub.add_parser('install')
-    install.add_argument('--apk', required=True, type=Path)
-    install.add_argument('--receipt', required=True, type=Path)
+    for action in ('install', 'verify-install'):
+        install = sub.add_parser(action)
+        install.add_argument('--apk', required=True, type=Path)
+        install.add_argument('--receipt', required=True, type=Path)
     args = parser.parse_args()
     if not args.serial:
         parser.error('--serial or TV_SERIAL is required; no device address is stored in source')
@@ -85,17 +86,27 @@ def main() -> None:
     elif args.action == 'launch':
         tv.run('shell', 'am', 'start', '-n', COMPONENTS[args.app], timeout=30)
         print(json.dumps({'launch_requested': args.app, 'visible_effect_verified': False}))
-    elif args.action == 'install':
+    elif args.action in ('install', 'verify-install'):
         receipt = validate_install(args.apk, args.receipt)
-        tv.run('install', '-r', str(args.apk.resolve()), timeout=180)
+        client_timeout = False
+        if args.action == 'install':
+            try:
+                tv.run('install', '-r', str(args.apk.resolve()), timeout=180)
+            except subprocess.TimeoutExpired:
+                # The package manager may finish after the host client exits.
+                # Never retry a mutation on the strength of that timeout alone.
+                client_timeout = True
         remote = tv.run('shell', 'pm', 'path', 'ai.rplay.carcast')
         if not remote.startswith('package:') or '\n' in remote:
             raise RuntimeError('Cannot identify the installed CarCast APK')
         path = remote.removeprefix('package:')
         installed = tv.run('shell', 'md5sum', path).split()[0]
         if installed != hashlib.md5(args.apk.read_bytes()).hexdigest():
-            raise RuntimeError('Installed APK byte identity check failed')
-        print(json.dumps({'installed_sha256': receipt['sha256'], 'data_preserved_by_install_r': True,
+            raise RuntimeError('Installed APK differs from candidate; installation may still be pending. '
+                               'Check the TV confirmation, then use verify-install before retrying.')
+        print(json.dumps({'installed_sha256': receipt['sha256'],
+                          'install_requested': args.action == 'install',
+                          'client_timeout_observed': client_timeout,
                           'functional_acceptance': 'not implied by installation'}))
 
 

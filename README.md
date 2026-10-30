@@ -11,10 +11,13 @@
 - `src/carcast/`：本项目新增Smali适配代码及5个原厂类的最小钩子补丁。
 - `tools/`：构建、已授权电视的部署/按键与普通实时预览工具。
 - `experiments/`：未通过验收的历史实验；**不进入默认构建**。特别是交互PCM限制已撤回。
+- `upstream/aerial-tv/`：Aerial官方MIT源码子模块，固定为电视当前1.72对应提交；使用`git clone --recurse-submodules`或`git submodule update --init --recursive`取得源码。不会自动升级电视上的Aerial。
 - `dependencies.lock.json`：原厂APK和工具的官方来源与固定SHA256。
 - `local/`：仅本地保存的运行材料、上游应用解包目录和设备记录，全部被Git忽略。
 
 CarCast是闭源第三方基线，本仓库不包含其完整反编译代码、APK或原生库。构建从[原厂公开发布](https://github.com/rPlayAI/carcast-public/releases/tag/android-0.3.25)获取基线，仅重现本项目补丁。保留原测试期限 **2027-01-19** 及认证逻辑。本项目不是原厂发行版，不表示与Apple、小米或CarCast原厂有关联。
+
+Aerial来源为[pengchujin/aerial-tv](https://github.com/pengchujin/aerial-tv)。已核对官方v1.72发布资产SHA256与电视安装包一致，固定来源见依赖锁文件。最新上游版本可能更高，本项目保留已验收的1.72基线。
 
 ## 构建
 
@@ -47,6 +50,8 @@ python3 tools/device.py launch carcast
 ```
 
 工具先核对设备型号、API和ABI；覆盖安装使用`install -r`保留数据，并核对设备安装包字节一致。不自动卸载，不清除配对，不修改Wi-Fi、代理或路由。第一次配对和手机端权限仍应在设备正常界面完成。安装通过不等于功能验收通过。
+
+电视可能要求对本次安装单独确认；保留“应用到全部”未勾选。若电脑等待超时，电视仍可能稍后完成安装，不应立即重复安装。确认后可把上述命令的`install`改为`verify-install`，仅核对当前设备安装包，不发起安装。
 
 ```sh
 python3 tools/device.py remote right ok back
