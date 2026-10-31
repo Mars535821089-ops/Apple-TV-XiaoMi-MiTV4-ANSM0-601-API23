@@ -44,8 +44,8 @@ export TV_SERIAL='电视IP:5555'
 adb -P 5040 connect "$TV_SERIAL"
 python3 tools/device.py status
 python3 tools/device.py install \
-  --apk build/outputs/CarCast-0.3.25-audit20-reconnect-lifecycle-aligned-debugSigned.apk \
-  --receipt build/outputs/audit20-reconnect-lifecycle.json
+  --apk build/outputs/CarCast-0.3.25-audit38-render-generation-aligned-debugSigned.apk \
+  --receipt build/outputs/audit38-render-generation.json
 python3 tools/device.py launch carcast
 ```
 
@@ -117,3 +117,7 @@ python3 tests/run_focus_geometry.py --java /path/to/java
 `--input-probe spatial-navigation --label audit32-spatial-lifecycle`为独立空间执行候选，真实方向键通过逐步视频焦点观察寻找同排/同列目标（最多12步），不使用光标或触摸。仅部分实机通过：电话下到播放中、上回电话；连续其他列出现观察超时，速度约0.5–3.5秒，长按/翻页/完整覆盖尚未通过。未知焦点时停止并阻止确定，按返回或菜单明确退出该次操作；音量和一般失焦不会解除保护。此候选不能替代最终验收，默认构建仍为audit20。
 
 `tests/run_spatial_keys.py`使用API23实际KeyEvent与实验CnKeys，隔离协调器及原生传输，验证移动中确定门禁、松键释放、音量隔离、主页恢复和方向单路由；不是完整手机会话测试。纯路径与观察状态合同随`tests/run_focus_geometry.py`运行。像素仅存在短时内存，不写图片/录像或像素日志。
+
+当前默认源码升级为`audit36-current-surface`：在audit20的自有修复上，阻止旧TextureView的迟到Available覆盖正在使用的新实例；没有活动实例时保留纹理重新进入的路径。实际API23 SurfaceTexture/Surface与隔离原生sink回归先FAIL后PASS，不能据此宣称已修复所有冻结。空间候选、圆形焦点识别和7秒迟到画面对照仍只在实验构建，不进入默认版本。
+
+后续默认`audit38-render-generation`补齐空窗：由弱引用记录最近挂载的显示实例，current清空后只有该实例能重新绑定；每次挂载、绑定和销毁推进显示代次。实验观察器使用代次验证缓存，显示替换时取消旧观察。实际Surface回调隔离用例覆盖旧A→新B→current空→旧A迟到→B再进入；完整设备稳定性仍待验收。

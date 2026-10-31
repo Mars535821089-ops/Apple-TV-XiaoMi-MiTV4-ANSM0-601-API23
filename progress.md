@@ -116,3 +116,19 @@ Ruling: 已有三类控件几何证据，开始有界空间路径候选；先验
 已安装核对audit32-spatial-lifecycle，SHA256 a66ae25fc3493fb1d50f855c6f27c18724b4e47d2de3ea6634f7eaac5ced087d，PID21056。真实DPAD_DOWN从电话穿过同排焦点到同列播放中（3518ms）；DPAD_UP回电话（2581ms），普通预览逐终点确认。Right电话到音乐2198ms。之后Down音乐第一步Maps964ms，下一步changed=0超时，实际预览已在信息，安全门禁停止，未盲回滚/Select。方向可靠性与响应速度仍不通过，不能宣称完整四向。新候选真实普通窗口，无图片/录像文件。
 
 审查修正：OOM不能留下永久busy；前向同坐标循环unknown；焦点外页面变化保守检测；音量/失焦stop保持unknown；明确Back/Menu与新的主屏连接cancel重置。API23实际CnKeys+KeyEvent隔离验证门禁/UP释放/音量/Home/方向单路由先红后绿，实际队列取消/用户报告保留通过。
+
+## audit33–37继续：取帧、圆形焦点与显示所有权
+
+audit33摘要排除本次空白取帧：51840不透明像素且亮像素/均值正常。一次会话Texture帧停10，F10重建后同PID恢复，独立停帧尚未统一归因。audit34实机音乐Down到LEXUS正确3559ms、Up回音乐4674ms；连续其他列仍超时。audit35把观察诊断延至7秒仍失败，未当作修复；一次Up在中途PlayingNow后图像摘要7秒不变，随后预览已Messages，继续查显示/观察时序。不得继续盲加等待。
+
+源码查到观察器每100ms重复getBitmap，即使没有新Texture帧；已先红后绿改为只对新版本读回一次，缓存同一新帧用于稳定确认，未实机验证改善。新增圆形按钮闭合环与残缺环拒绝两项几何（共14项），与方框/列表分开，未夸大应用覆盖。
+
+独立确定缺陷：旧CnRender迟到Available可覆盖新实例output，之后旧Destroyed不清理但释放旧纹理。API23真实SurfaceTexture/Surface、实际Available与route、隔离native sink先FAIL后PASS；修复阻止不同活动实例抢输出，current为空时保留重新进入，旧实例不绑定/不安排watch。默认源码audit36已构建47e88f82b736232a2c5fa8b98a1e7b6830339af6245740ac62ca5b71a86c5f91，未单独安装。不把此所有权缺陷宣称为所有停帧根因。
+
+目前安装audit35 d996f5a54591a113ee456082afe67a80ab8232b5535acabdaa042cb210764493 PID23591。audit37（含36所有权及新帧缓存）正在构建。已有自动重连，启动接收器前必须确认会话状态，禁止无脑Down+OK，否则已连接卡会变成断开。监控包含CarCast-screen与OMX组件名，拒绝色彩格式17=软件解码的无证据判断。
+
+## audit38 baseline and audit39 render-generation candidate
+
+Default audit38 built f1a7cc7e6c75bced995e81914effe32a88a15653152b9bde3b6e68becac57e45 (not separately installed). Latest-owner weak reference prevents obsolete A from reclaiming current while B is temporarily destroyed; real API23 SurfaceTexture/Surface regression failed before, passed after, including B re-entry and zero obsolete binds/watch scheduling. Probe cache now checks render generation: repeated frame numbers across replacement cannot confirm old focus, and replacement during baseline capture sends no input. Both new cases failed before and passed after.
+
+Installed audit37 cached fresh-frame candidate still froze at 5 initial frames; F10 restored the same process. Afterwards Music DOWN reached same-column LEXUS in3278ms, bottom-row RIGHT reached Calendar1301ms and Settings924ms. Settings DOWN again timed out after7s: list navigation remains FAILED. Extending observation or reducing repeated GPU reads is not a demonstrated freeze fix. Native in/out count attempts, not checked-success values. Active component is OMX.amlogic.avc.decoder.awesome; color-format17 alone was not evidence. A zero-wait drain-after-input tail-frame window is under investigation; no native decoder patch applied yet. Candidate39 f58fec7a41979a9b4a971809ec8977a72f0962b83201aebe4e7212abace533df install in progress, do not repeat before receipt.

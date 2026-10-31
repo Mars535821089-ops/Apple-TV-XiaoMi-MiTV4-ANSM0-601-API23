@@ -74,8 +74,23 @@ public final class CnFocusGeometry {
                 if(r-l>1 && mask[y*width+r-1]==2) edgeHits++;
             }
             boolean outline=r-l>=12 && b-t>=12 && edgeHits*100L>=perimeter*40L;
+            boolean ring=false;int w=r-l,h=b-t;
+            if(w>=12 && h>=12 && w<=120 && h<=120 && w<=2*h && h<=2*w
+                    && n*100L>=rect*8L && n*100L<=rect*55L) {
+                int sectors=0,band=0;long radius=(long)w*h;radius*=radius;
+                for(int j=0;j<tail;j++) {
+                    int i=queue[j],y=i/width,x=i-y*width;
+                    long dx=(long)(2*x-l-r+1)*h,dy=(long)(2*y-t-b+1)*w;
+                    long d=dx*dx+dy*dy;
+                    if(d*100>=radius*45 && d*100<=radius*140) {
+                        band++;int quadrant=(dx>=0?0:2)+(dy>=0?0:1);
+                        sectors|=1<<(quadrant*2+(Math.abs(dx)>=Math.abs(dy)?0:1));
+                    }
+                }
+                ring=sectors==255 && band*100L>=n*70L;
+            }
             if(stats!=null && stats.length>=16 && n==stats[9]) stats[15]=edgeHits*1000/Math.max(1,perimeter);
-            if(n<16 || r-l<8 || b-t<3 || (n*100L<rect*38L && !outline)) continue;
+            if(n<16 || r-l<8 || b-t<3 || (n*100L<rect*38L && !outline && !ring)) continue;
             if(n>best) {
                 second=best;best=n;bestL=l;bestT=t;bestR=r;bestB=b;bestFill=n*1000/rect;
             } else second=Math.max(second,n);

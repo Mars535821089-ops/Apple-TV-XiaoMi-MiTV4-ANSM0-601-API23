@@ -49,6 +49,18 @@ public final class FocusGeometryTest {
         if(!CnFocusGeometry.sameScene(a,b,W,H,from,to)) throw new AssertionError("focus change inside known controls must preserve scene");
         box(b,40,115,310,170,0xffb0b0b0);
         if(CnFocusGeometry.sameScene(a,b,W,H,from,to)) throw new AssertionError("changed page content outside focus cannot be treated as same scene");
+        a=frame();b=frame();
+        for(int y=80;y<104;y++)for(int x=160;x<184;x++) {
+            double dx=(x-171.5)/11.5,dy=(y-91.5)/11.5,d=dx*dx+dy*dy;
+            if(d<=1.03 && d>=.64)b[y*W+x]=LIGHT;
+            else if(d<.64)b[y*W+x]=0xff2078d0;
+        }
+        int[] circle=CnFocusGeometry.analyze(a,b,W,H);
+        if(circle==null || circle[0]!=160 || circle[1]!=80 || circle[2]!=184 || circle[3]!=104)
+            throw new AssertionError("circular focus ring around colored dashboard button must be recognized");
+        cases++;
+        for(int y=80;y<92;y++)for(int x=172;x<184;x++)b[y*W+x]=DARK;
+        none(a,b,"incomplete circular highlight is not a confirmed focus ring");
         System.out.println("PASS: "+cases+" focus geometry cases");
     }
 }

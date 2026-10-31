@@ -1,5 +1,11 @@
 
 # Reads this app's existing video texture into bounded transient arrays only.
+.method public static captureProbeGeneration()J
+ .locals 2
+ sget-wide v0,Lai/rplay/carcast/CnRender;->generation:J
+ return-wide v0
+.end method
+
 .method public static captureProbeFrame()[I
  .locals 10
  const/4 v8,0x0

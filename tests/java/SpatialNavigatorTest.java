@@ -16,7 +16,7 @@ public final class SpatialNavigatorTest {
         reset(250,20);CnSpatialNavigator.request(22);move(55,94);
         check(CnSpatialNavigator.busy()&&CnProbeHost.lastWheel==-1,"row wrap must start verified rollback");
         move(250,20);check(!CnSpatialNavigator.busy()&&!CnSpatialNavigator.uncertain(),"verified rollback finishes at source");
-        reset(120,20);CnSpatialNavigator.request(20);CnProbeHost.clock+=2301;CnProbeHost.tick();
+        reset(120,20);CnSpatialNavigator.request(20);CnProbeHost.clock+=7501;CnProbeHost.tick();
         check(!CnSpatialNavigator.busy()&&CnSpatialNavigator.uncertain()&&CnProbeHost.inputs==1,"unknown movement cannot issue blind rollback");
         CnSpatialNavigator.request(22);check(CnProbeHost.inputs==1,"unknown focus requires explicit cancel before another direction");
         CnSpatialNavigator.stop();check(CnSpatialNavigator.uncertain(),"volume or unrelated keys cannot unlock uncertain Select");

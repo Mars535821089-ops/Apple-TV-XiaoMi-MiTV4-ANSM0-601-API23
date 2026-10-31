@@ -43,6 +43,12 @@
 
 ## 当前恢复状态
 
-keep_adb已启用并读回，实际调试暂时稳定；不代表最终ADB关卡通过。audit16安装结果已补核对通过；audit18输入重叠释放及Surface所有权修复已安装核对，实机连续帧更新超过150秒，方向仍失败。当前安装audit19原轴诊断，包含18修复，只给F2..F9增加既有轴对照，实体方向映射暂未改。当前默认18，完整21项宿主及3项输入/1项Surface Android隔离回归通过。
+keep_adb已启用，当前连续施工调试可用，不代表最终重启及授权持久性通过。默认源码audit20包含输入生命周期、交叠释放、Surface所有权及重连代次修复，隔离回归通过；这些不等于完整设备验收。
 
-待继续：原轴真实空间行为、跨应用按钮、重连代次修复、Siri及长期稳定性；声音和最终ADB验收仍最后。整体业务估算58%，不以源码或诊断候选安装算四向完成。Aerial实际为官方1.74，源码锁已对应，旧1.72元数据保留。
+已安装核对audit32空间方向候选（含默认修复）。真实Phone下到同列PlayingNow、上回Phone已验证，响应2.6–3.5秒；其他列观察出现超时，完整方向、长按、翻页及可靠性仍未通过。audit33仅增加取帧摘要，安装待核对时以progress及实际回执为准。
+
+源码与对应试验和失败记录已推送2262178。继续定位观察链失准并完成跨应用、重连、Siri和长期稳定性。声音和最终ADB验收仍最后。整体业务估算58%；Aerial实际官方1.74且源码锁对应，旧1.72基线元数据保留。
+
+## Latest authoritative continuation
+
+Default source is audit38-render-generation. Device last verified audit37, audit39 deployment awaits its receipt. Grid directions partially pass; settings DOWN and intermittent display stalls remain failed. No audio or final ADB acceptance yet. Overall estimate remains58%. See latest progress and live receipts rather than older baseline paragraphs.

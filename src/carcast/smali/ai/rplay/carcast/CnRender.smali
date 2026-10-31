@@ -5,6 +5,8 @@
 
 .field private static current:Lai/rplay/carcast/CnRender;
 .field private static output:Landroid/view/Surface;
+.field private static latest:Ljava/lang/ref/WeakReference;
+.field private static generation:J
 .field private watch:Landroid/os/Handler;
 .field private lastFrame:J
 .field private frames:J
@@ -43,6 +45,10 @@
     new-instance v2, Lai/rplay/carcast/CnRender;
     invoke-direct {v2, p0}, Lai/rplay/carcast/CnRender;-><init>(Landroid/content/Context;)V
     sput-object v2, Lai/rplay/carcast/CnRender;->current:Lai/rplay/carcast/CnRender;
+    new-instance v3, Ljava/lang/ref/WeakReference;
+    invoke-direct {v3, v2}, Ljava/lang/ref/WeakReference;-><init>(Ljava/lang/Object;)V
+    sput-object v3, Lai/rplay/carcast/CnRender;->latest:Ljava/lang/ref/WeakReference;
+    invoke-static {}, Lai/rplay/carcast/CnRender;->bumpGeneration()V
     const/4 v3, 0x0
     invoke-virtual {v2, v3}, Landroid/view/View;->setFocusable(Z)V
     invoke-virtual {v2, v3}, Landroid/view/View;->setClickable(Z)V
@@ -78,6 +84,21 @@
 
 .method public onSurfaceTextureAvailable(Landroid/graphics/SurfaceTexture;II)V
     .locals 2
+    # A superseded view can receive a late Available after its replacement.
+    # It must never replace the active native output or schedule a watcher.
+    sget-object v0, Lai/rplay/carcast/CnRender;->current:Lai/rplay/carcast/CnRender;
+    if-nez v0, :available_current
+    sget-object v0, Lai/rplay/carcast/CnRender;->latest:Ljava/lang/ref/WeakReference;
+    if-eqz v0, :obsolete
+    invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
+    move-result-object v0
+    :available_current
+    if-ne v0, p0, :obsolete
+    :available_owner
+    # A retained Activity may get another Available after its texture was
+    # destroyed in the background and current was cleared. Preserve re-entry.
+    sput-object p0, Lai/rplay/carcast/CnRender;->current:Lai/rplay/carcast/CnRender;
+    invoke-static {}, Lai/rplay/carcast/CnRender;->bumpGeneration()V
     new-instance v0, Landroid/view/Surface;
     invoke-direct {v0, p1}, Landroid/view/Surface;-><init>(Landroid/graphics/SurfaceTexture;)V
     sput-object v0, Lai/rplay/carcast/CnRender;->output:Landroid/view/Surface;
@@ -90,6 +111,7 @@
     move-result-wide v0
     iput-wide v0, p0, Lai/rplay/carcast/CnRender;->lastFrame:J
     invoke-direct {p0}, Lai/rplay/carcast/CnRender;->schedule()V
+    :obsolete
     return-void
 .end method
 
@@ -108,6 +130,7 @@
     :clear
     sput-object v1, Lai/rplay/carcast/CnRender;->output:Landroid/view/Surface;
     sput-object v1, Lai/rplay/carcast/CnRender;->current:Lai/rplay/carcast/CnRender;
+    invoke-static {}, Lai/rplay/carcast/CnRender;->bumpGeneration()V
     :done
     const/4 v0, 0x1
     return v0
@@ -115,6 +138,15 @@
 
 .method public onSurfaceTextureSizeChanged(Landroid/graphics/SurfaceTexture;II)V
     .locals 0
+    return-void
+.end method
+
+.method private static bumpGeneration()V
+    .locals 4
+    sget-wide v0, Lai/rplay/carcast/CnRender;->generation:J
+    const-wide/16 v2, 0x1
+    add-long/2addr v0, v2
+    sput-wide v0, Lai/rplay/carcast/CnRender;->generation:J
     return-void
 .end method
 

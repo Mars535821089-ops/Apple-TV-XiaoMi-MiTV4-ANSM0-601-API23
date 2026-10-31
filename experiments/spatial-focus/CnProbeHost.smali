@@ -20,6 +20,12 @@
  move-result-wide v0
  return-wide v0
 .end method
+.method public static generation()J
+ .locals 2
+ invoke-static {},Lai/rplay/carcast/CnRender;->captureProbeGeneration()J
+ move-result-wide v0
+ return-wide v0
+.end method
 .method public static send(II)V
  .locals 2
  const/4 v1,0x0
