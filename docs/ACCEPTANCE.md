@@ -1,7 +1,7 @@
 # 全方位验收清单
 
 > **CarPlay adaptation is shelved at the user's request (2026-11-01). Do not resume development, device testing or deployment without a new user request. This is not a completed compatibility release.**
-> See [current delivery status](docs/DELIVERY_STATUS.md) for the separate desktop, Hongguo and ADB results.
+> See [current delivery status](DELIVERY_STATUS.md) for the separate desktop, Hongguo and ADB results.
 
 
 状态：通过 / 失败 / 部分通过 / 待测 / 需手机权限。代码或仿真通过不代表实机通过。每项记录触发、预期、实际、接收进程是否存活、会话是否保留，以及证据来源；不保存截图或录像。
@@ -30,7 +30,7 @@
 | 稳定性 | 连续使用、应用切换、重复进出、内存与热负载、无崩溃 | 部分通过：audit18本轮连续帧更新超过150秒；完整长时、跨应用与恢复仍待测，旧停帧未统一归因 |
 | 部署 | 干净基线构建、资源保留、覆盖安装保数据、回退路径 | 进行中 |
 | 公开源码 | 指定本地目录、公开仓库、源码完整、无设备资料或第三方二进制 | 进行中 |
-| ADB最终关卡 | 持续开启；重启后接受原电脑；多次自动连接不需电视确认 | **最后验收**：用户确认开机允许稍后拒绝，明确未通过；已启用现有keep_adb保持施工，重启及授权持久性仍最后验收 |
+| ADB最终关卡 | 持续开启；重启后接受原电脑；多次自动连接不需电视确认 | **用户确认完成**：2026-11-01用户补充“ADB重启已完成”；按用户验收记录，不再执行新的重启测试 |
 
 ## 应用内部覆盖
 

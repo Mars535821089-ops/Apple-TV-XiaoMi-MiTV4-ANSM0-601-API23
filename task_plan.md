@@ -52,3 +52,7 @@ Default source remains audit38-render-generation. Last installed/byte-verified l
 Grid/list spatial navigation has partial successful endpoints, but latency, intermittent stale frames, long-press, scrolling and pagination remain failed or unverified. The first-poll-wait and delta-only wheel experiments did not resolve initial freezes and are omitted from audit44. Do not promote partial tests into whole-device acceptance.
 
 Hongguo MPV0.2.136 installed and opened per the user's separate request. Continue original adaptation. Audio experience and final persistent-ADB acceptance remain last. Overall estimated58%; authoritative latest evidence is in progress.md and docs/ACCEPTANCE.md.
+
+## Delivery closeout update
+
+User confirmed ADB reboot acceptance completed on 2026-11-01. CarPlay remains shelved, active goal cleared. Current work is project rename and source synchronization only.

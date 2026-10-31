@@ -12,7 +12,7 @@
 - 从干净原厂基线重建audit11，签名APK SHA256与设备安装版完全一致；原始资源与资产568项保留，ARM32对齐32例、桥接30例、HID分配复制4例通过。
 - 构建环境发现系统python3为3.9、与pyelftools要求不符；已固定uv使用现有Python3.12.4，哈希读取改为兼容的分块实现。构建和6项边界测试已通过。
 - 单实例预览显式指定 OMX.amlogic.video.encoder.avc 后，普通800×450窗口再次获得当前CarPlay画面；默认按类型创建AVC编码器曾初始化失败。
-- 公开仓库已创建并推送： https://github.com/Mars535821089-ops/Carplay-XiaoMi-MiTV4-ANSM0-601-API23 。默认分支 codex/tv-carplay-adaptation，初始提交2ef6a23；GitHub REST确认公开。
+- 公开仓库已创建并推送： https://github.com/Mars535821089-ops/Apple-TV-XiaoMi-MiTV4-ANSM0-601-API23 。默认分支 codex/tv-carplay-adaptation，初始提交2ef6a23；GitHub REST确认公开。
 - 用户新增实机失败：iPhone画面、电视声音的视频播放明显不同步。保持该项失败，研究MainHighAudio102缓冲协商；不能把此前“出声”确认升级为音频全通过。
 - 定位原厂CFLString常量头，原先只按裸字符串定位无法发现属性引用的问题已修正；找到audioLatencies、audioLatencyMs、mainBuffered等引用点。
 - 低延迟媒体协商实验候选已生成并通过原厂函数仿真：100媒体AAC-LC，省略102/103媒体能力；其他交互/语音格式保留。签名候选SHA256 887397bab38683d17424d7cce4ed100ef7b5e1401949b5ac6a5404fdf6149695。此为待验收候选，不进入默认构建，不宣称降低延迟。
@@ -168,3 +168,7 @@ Hongguo MPV0.2.136 was installed and launched, installed-byte check passed. Real
 ## User-directed closeout - 2026-11-01
 
 CarPlay adaptation SHELVED. Goal remains paused, not achieved. No further adaptation tests, code changes or deployment are authorized by this status question. Owned preview/monitor stopped and CarCast force-stopped; Aerial foreground verified again. Aerial1.74 and Hongguo MPV0.2.136 installed. Aerial startup/Home/icon labels were previously confirmed; Hongguo complete playback/remote/audio acceptance, persistent ADB reboot-duration acceptance and full AirPlay/mirroring acceptance remain unverified. See docs/DELIVERY_STATUS.md. Do not describe the entire non-CarPlay scope as fully accepted.
+
+## 2026-11-01 user-confirmed ADB and project rename
+
+User confirmed ADB reboot acceptance is complete. Project renamed to Apple TV-XiaoMi MiTV4-ANSM0-601-API23 locally; GitHub uses Apple-TV-XiaoMi-MiTV4-ANSM0-601-API23 because spaces are normalized to hyphens. CarPlay stays shelved and the user cleared the active goal. No adaptation testing or new reboot is authorized by this rename. Historical technical CarPlay component names are retained for source reproducibility.
