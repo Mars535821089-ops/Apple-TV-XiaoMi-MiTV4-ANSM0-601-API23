@@ -44,3 +44,10 @@
 ## audit32空间候选补充
 
 电话→同列播放中（Down3518ms）、播放中→电话（Up2581ms）已在实际会话按键及普通预览验证；Right电话→音乐也可到达。其他列连续Down曾在中间项超时，即使预览可见新焦点也未被该步骤确认。方向可靠性、速度、长按和翻页仍未通过，不提升完整交付结论。屏蔽未知焦点的确定键是保护措施，不是兼容成功。
+
+## 2026-11-01 memory compatibility checkpoint
+
+- Actual television syscall385 returned ENOSYS38; the ring initializer's positive38 path is confirmed before codec creation.
+- Actual patched audit44 APK library passed independent on-TV initialization, aligned and power-of-two double mappings, wrap aliases and the original destructor. Twenty ASLR/error/cleanup cases also passed, including valid address0 failure cleanup.
+- audit44 deployed and installed bytes verified. No actual telephony request has yet been accepted on this version; call quality, Siri, media mixing and delay remain unaccepted. The allocator result is not a substitute for these requirements.
+- Hongguo MPV0.2.136 installation and launch are complete as a separate user request. Playback and full remote acceptance remain untested and do not advance CarPlay completion.

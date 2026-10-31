@@ -41,14 +41,10 @@
 | macOS侧边缩略图 | 不能看清控件，不算界面验收 | 普通窗口恢复后观察，不抢占全屏 |
 | 音频实验capabilities不符合预期 | 发现条件记录是type103，type102另有独立记录 | 仿真通过但实机无音频通道；已撤回并恢复audit11 |
 
-## 当前恢复状态
+## Current verified continuation
 
-keep_adb已启用，当前连续施工调试可用，不代表最终重启及授权持久性通过。默认源码audit20包含输入生命周期、交叠释放、Surface所有权及重连代次修复，隔离回归通过；这些不等于完整设备验收。
+Default source remains audit38-render-generation. Last installed/byte-verified live candidate is audit44-ashmem-cleanup, SHA2563234fbf577f9ecef4bb74f5e1868195df4ce09844d117d1f5dd87c56d668361b. It adds ENOSYS-only anonymous mirrored-memory compatibility while preserving all original audio capabilities. Actual patched APK initializer and original destructor passed isolated TV execution; full telephony/Siri and live session acceptance remain open.
 
-已安装核对audit32空间方向候选（含默认修复）。真实Phone下到同列PlayingNow、上回Phone已验证，响应2.6–3.5秒；其他列观察出现超时，完整方向、长按、翻页及可靠性仍未通过。audit33仅增加取帧摘要，安装待核对时以progress及实际回执为准。
+Grid/list spatial navigation has partial successful endpoints, but latency, intermittent stale frames, long-press, scrolling and pagination remain failed or unverified. The first-poll-wait and delta-only wheel experiments did not resolve initial freezes and are omitted from audit44. Do not promote partial tests into whole-device acceptance.
 
-源码与对应试验和失败记录已推送2262178。继续定位观察链失准并完成跨应用、重连、Siri和长期稳定性。声音和最终ADB验收仍最后。整体业务估算58%；Aerial实际官方1.74且源码锁对应，旧1.72基线元数据保留。
-
-## Latest authoritative continuation
-
-Default source is audit38-render-generation. Device last verified audit37, audit39 deployment awaits its receipt. Grid directions partially pass; settings DOWN and intermittent display stalls remain failed. No audio or final ADB acceptance yet. Overall estimate remains58%. See latest progress and live receipts rather than older baseline paragraphs.
+Hongguo MPV0.2.136 installed and opened per the user's separate request. Continue original adaptation. Audio experience and final persistent-ADB acceptance remain last. Overall estimated58%; authoritative latest evidence is in progress.md and docs/ACCEPTANCE.md.

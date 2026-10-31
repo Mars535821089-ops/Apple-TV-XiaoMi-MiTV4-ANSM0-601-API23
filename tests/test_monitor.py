@@ -22,6 +22,11 @@ class MonitorPrivacyTests(unittest.TestCase):
     def test_secret_line_is_dropped_even_when_audio_keyword_matches(self):
         self.assertIsNone(monitor.redact('CarCast audioType: media passphrase=example-private-value'))
 
+    def test_shared_memory_status_is_kept_without_recording_sensitive_payloads(self):
+        self.assertEqual(monitor.redact('CnMirror ashmem fallback status=0 size=12288'),
+                         'CnMirror ashmem fallback status=0 size=12288')
+        self.assertIsNone(monitor.redact('CnMirror secret=not-for-recording'))
+
     def test_unrelated_protocol_payload_is_not_recorded(self):
         self.assertIsNone(monitor.redact('HTTP request body: arbitrary payload'))
 

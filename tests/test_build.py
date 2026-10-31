@@ -22,6 +22,15 @@ class BuildBoundaryTests(unittest.TestCase):
                 self.assertEqual(error.exception.code, 2)
                 artifact.assert_not_called()
 
+    def test_memory_probe_rejects_default_before_accessing_dependencies(self):
+        stderr=io.StringIO()
+        with patch('sys.argv',['build.py','--memory-probe','ashmem']),contextlib.redirect_stderr(stderr):
+            with patch.object(build,'artifact') as artifact:
+                with self.assertRaises(SystemExit) as error:build.main()
+                self.assertEqual(error.exception.code,2)
+                artifact.assert_not_called()
+        self.assertIn('Probes need a separate --label',stderr.getvalue())
+
     def test_poisoned_cache_is_not_silently_trusted(self):
         with tempfile.TemporaryDirectory() as folder:
             cache = Path(folder)

@@ -154,3 +154,13 @@ Installed/verified73b300ba63ef119efcbe784b03420bf61f2a197bd710489a050e0b2caa9449
 Added light-appearance polarity handling: original geometry selected the old row in a synthetic light UI; now17 geometry fixtures and all probe/path/generation contracts pass. This is not light-theme hardware acceptance. Relative Wheel descriptor is Data/Variable/Relative; known sender copies bytes and visible queues do not deduplicate. Delta-only opt-in removed only its redundant zero report. Actual API23 Host.send/CnInput isolated test failed with2 reports before, passes with1 plus preserved normal cancellation neutral afterward.
 
 audit42 installed/verified8e2b960dbc08298284a69a92164029ef36d465c8b37bfe50f40d8d9a932ee31c, PID28307. Initial Right still timed out (baseline38 frames unchanged), so delta-only is not a demonstrated initial-freeze fix. F10 recreated output, then a separate new MainAudio(100) telephony request negotiated0x40000000/Opus48k at80ms and failed38/0x26; SDK tore down the session. No real phone call was initiated by our tests. This connection-breaking audio-format path is now being traced, preserving media AAC102 and all required user functions. Audio subjective acceptance remains deferred.
+
+## 2026-11-01 actual shared-memory compatibility
+
+Confirmed the original memfd_create syscall385 returns -1/errno38 on the API23 television. The mirror initializer propagates38 before the audio decoder is created. Added an ENOSYS-only fallback using anonymous ashmem with original page/power-of-two alignment and exact double mapping; all audio capability records remain untouched.
+
+Independent review found a cleanup bug when a valid reservation is address0; added a failing ASLR fixture, corrected to an explicit reserved flag, and passed20 actual Thumb/C adapter execution cases. Native TV test of the C adapter passed successful alignment/alias and three mapping failure cleanup cases. More strongly, the EXACT audit44 APK library loaded in an isolated television process, its actual patched initializer created both normal and power-of-two rings; synthetic wrap alias passed and its original vendor destructor released/cleared all six words. No phone calls/audio input were used.
+
+Candidate audit44 SHA2563234fbf577f9ecef4bb74f5e1868195df4ce09844d117d1f5dd87c56d668361b is in one-time installation; verify the pending receipt before retrying. This proves the old-kernel allocation fix, not telephony audio quality, Siri, direction reliability or full session acceptance. Default remains audit38 pending live app evidence.
+
+Hongguo MPV0.2.136 was installed and launched, installed-byte check passed. Real playback, sound and full remote traversal were not accepted; its successful install does not advance CarPlay completion.

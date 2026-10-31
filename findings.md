@@ -51,3 +51,5 @@
 
 - 有结构化deviceOfferFocus/focusTransfer通道，但只证明视区焦点移交能力，未证明控件级矩形回调或当前delegate注册；Java接口未提供控件树。不能据此宣称已存在可用全应用空间导航。
 - 原厂CarCastForceKeyFrame(0x14850c)接收有效CFLString UUID，使用当前会话发forceKeyFrame队列命令；空UUID/会话直接返回。已有Java setScreenSurface同窗口且codec有效时不触发此请求。不能传jstring/slot号代替UUID或忽略对象生命周期。Siri也未定位到证据充分的出站请求入口；能力声明及入站enhancedSiriParameters不能冒充发送接口。
+
+- New confirmed error38 cause: memfd_create syscall385 is ENOSYS on the television kernel3.14. MirrorRingBuffer returns positive errno before Opus codec creation. Do not delete Opus/media formats to conceal this allocation failure. The final own fallback and original vendor ring destructor passed actual APK-library execution on the TV; full session and subjective audio remain separate.

@@ -91,10 +91,11 @@ def main() -> int:
     parser.add_argument('--video-probe', choices=['return-status','first-poll-wait','first-poll-wait-return-status'],
                         help='Codec return telemetry only; requires a separate --label')
     parser.add_argument('--wheel-probe', choices=['delta-only'],help='Relative wheel without redundant zero report; spatial probe only')
+    parser.add_argument('--memory-probe',choices=['ashmem'],help='ENOSYS-only mirrored-memory compatibility candidate')
     args = parser.parse_args()
     if args.wheel_probe and args.input_probe not in {'spatial-focus','spatial-navigation'}:
         parser.error('Wheel probe requires a separate spatial input probe')
-    if (args.input_probe or args.video_probe or args.wheel_probe) and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
+    if (args.input_probe or args.video_probe or args.wheel_probe or args.memory_probe) and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
         parser.error('Probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
@@ -161,6 +162,10 @@ def main() -> int:
         probe=output/f'CarCast-0.3.25-{args.label}-video-wait.apk'
         run(sys.executable,ROOT/'experiments/video_output_wait_probe.py','--source',candidate,'--output',probe)
         probe.replace(candidate)
+    if args.memory_probe:
+        probe=output/f'CarCast-0.3.25-{args.label}-memory-probe.apk'
+        run(sys.executable,ROOT/'experiments/mirror_compat_probe.py','--source',candidate,'--output',probe)
+        probe.replace(candidate)
     resources = verify_resources(upstream, candidate)
     final = candidate
     if signer is not None:
@@ -173,6 +178,7 @@ def main() -> int:
                'input_probe': args.input_probe,
                'video_probe': args.video_probe,
                'wheel_probe': args.wheel_probe,
+               'memory_probe': args.memory_probe,
                'upstream_sha256': digest(upstream), 'resources_preserved': resources,
                'original_audio_capabilities': True, 'device_acceptance': 'not implied by build'}
     (output / f'{args.label}.json').write_text(json.dumps(receipt, indent=2) + '\n')
