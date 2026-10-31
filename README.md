@@ -121,3 +121,5 @@ python3 tests/run_focus_geometry.py --java /path/to/java
 当前默认源码升级为`audit36-current-surface`：在audit20的自有修复上，阻止旧TextureView的迟到Available覆盖正在使用的新实例；没有活动实例时保留纹理重新进入的路径。实际API23 SurfaceTexture/Surface与隔离原生sink回归先FAIL后PASS，不能据此宣称已修复所有冻结。空间候选、圆形焦点识别和7秒迟到画面对照仍只在实验构建，不进入默认版本。
 
 后续默认`audit38-render-generation`补齐空窗：由弱引用记录最近挂载的显示实例，current清空后只有该实例能重新绑定；每次挂载、绑定和销毁推进显示代次。实验观察器使用代次验证缓存，显示替换时取消旧观察。实际Surface回调隔离用例覆盖旧A→新B→current空→旧A迟到→B再进入；完整设备稳定性仍待验收。
+
+Native video diagnostics remain opt-in: `--video-probe return-status` records ignored codec return values; `--video-probe first-poll-wait-return-status` adds a controlled5000us first output poll, while later polls remain0. Both require a unique diagnostic label and preserve the default baseline. Each native stub is validated with relocated Thumb emulation before signing; device acceptance is separate. Current real-device evidence and limitations are in progress.md. No decoder timing experiment is a completed compatibility claim.

@@ -10,7 +10,7 @@ import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-KEEP = re.compile(r'CnInput|CnRender|CnFocusProbe|CnReconnect|CnSiri|CnFrameHealth|CarPlay session|'
+KEEP = re.compile(r'CnInput|CnRender|CnFocusProbe|CnVideoReturn|CnReconnect|CnSiri|CnFrameHealth|CarPlay session|'
                   r'screen (?:start|stop) slot|slot [0-9]+: surface |no surface yet|waiting for surface|audio (?:setup|torn)|AudioStream|AudioTrack|'
                   r'decoder (?:started|released|configured|up|input stalled|fed)|configure/start failed|SetAVCC|output format|first frame|OMX\.[A-Za-z0-9._-]+|'
                   r'Main(?:High)?Audio|audioFormat|audioType|audioLatencyMs|latencyMs|'
@@ -48,7 +48,7 @@ def main():
     tv = TV(args.serial, args.adb, args.server_port)
     tv.identity()
     tags = ['CarCast:I', 'CarCast-sdk:I', 'CarCast-screen:D', 'ACodec:I', 'OMXClient:I', 'OMXNodeInstance:I', 'MediaCodec:I', 'CnInput:D', 'CnRender:I', 'CnReconnect:I',
-            'CnSiri:I', 'CnFocusProbe:I', 'CnFrameHealth:I', 'AudioTrack:W', 'AudioFlinger:W', 'libc:F', 'AndroidRuntime:E']
+            'CnSiri:I', 'CnFocusProbe:I', 'CnVideoReturn:I', 'CnFrameHealth:I', 'AudioTrack:W', 'AudioFlinger:W', 'libc:F', 'AndroidRuntime:E']
     process = subprocess.Popen(tv.prefix + ['logcat', '-b', 'main', '-b', 'crash', '-v', 'threadtime',
                                            '-T', '1', '-s'] + tags, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     selector = selectors.DefaultSelector()

@@ -88,9 +88,11 @@ def main() -> int:
               'spatial-focus': 'spatial_focus_probe', 'spatial-navigation': 'spatial_focus_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
+    parser.add_argument('--video-probe', choices=['return-status','first-poll-wait','first-poll-wait-return-status'],
+                        help='Codec return telemetry only; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
-        parser.error('Input probes need a separate --label; keep the baseline output')
+    if (args.input_probe or args.video_probe) and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
+        parser.error('Probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
     lock = json.loads((ROOT / 'dependencies.lock.json').read_text())
@@ -148,6 +150,14 @@ def main() -> int:
             '--source', candidate, '--output', probe,
             *(['--dpad'] if args.input_probe == 'additive-dpad' else []))
         probe.replace(candidate)
+    if args.video_probe in {'return-status','first-poll-wait-return-status'}:
+        probe=output/f'CarCast-0.3.25-{args.label}-video-probe.apk'
+        run(sys.executable,ROOT/'experiments/video_return_probe.py','--source',candidate,'--output',probe)
+        probe.replace(candidate)
+    if args.video_probe in {'first-poll-wait','first-poll-wait-return-status'}:
+        probe=output/f'CarCast-0.3.25-{args.label}-video-wait.apk'
+        run(sys.executable,ROOT/'experiments/video_output_wait_probe.py','--source',candidate,'--output',probe)
+        probe.replace(candidate)
     resources = verify_resources(upstream, candidate)
     final = candidate
     if signer is not None:
@@ -158,6 +168,7 @@ def main() -> int:
         verify_resources(upstream, final)
     receipt = {'label': args.label, 'apk': final.name, 'sha256': digest(final),
                'input_probe': args.input_probe,
+               'video_probe': args.video_probe,
                'upstream_sha256': digest(upstream), 'resources_preserved': resources,
                'original_audio_capabilities': True, 'device_acceptance': 'not implied by build'}
     (output / f'{args.label}.json').write_text(json.dumps(receipt, indent=2) + '\n')
