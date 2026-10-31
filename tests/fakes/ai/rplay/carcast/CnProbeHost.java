@@ -2,7 +2,7 @@ package ai.rplay.carcast;
 public final class CnProbeHost {
     public static int[] pixels;
     public static long clock,serial;
-    public static int inputs,deliveries,pendingToken;
+    public static int inputs,deliveries,pendingToken,lastWheel;
     public static boolean blocked,failFrame;
     public static Runnable onFrame;
     public static Runnable pending;
@@ -22,7 +22,7 @@ public final class CnProbeHost {
     public static long version(){return serial;}
     public static long now(){return clock;}
     public static void send(int wheel){send(wheel,0);}
-    public static void send(int wheel,int token){if(wheel!=1&&wheel!=-1)throw new AssertionError("unexpected input");inputs++;pendingToken=token;}
+    public static void send(int wheel,int token){if(wheel!=1&&wheel!=-1)throw new AssertionError("unexpected input");inputs++;pendingToken=token;lastWheel=wheel;}
     public static void post(Runnable r,long delay){pending=r;}
     public static void clear(){pending=null;}
     public static void log(String s){last=s;}

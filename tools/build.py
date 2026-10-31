@@ -85,7 +85,7 @@ def main() -> int:
     parser.add_argument('--label', default=DEFAULT_LABEL)
     probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe',
               'additive-dpad': 'additive_menu_probe', 'axis-nudge': 'axis_nudge_probe',
-              'spatial-focus': 'spatial_focus_probe'}
+              'spatial-focus': 'spatial_focus_probe', 'spatial-navigation': 'spatial_focus_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
@@ -123,10 +123,11 @@ def main() -> int:
         sys.path.insert(0, str(ROOT / 'experiments'))
         probe_module = importlib.import_module(probes[args.input_probe])
         smali_probe = probe_module.smali_probe
-        if args.input_probe == 'spatial-focus':
+        if args.input_probe in {'spatial-focus', 'spatial-navigation'}:
             probe_module.patch_helpers(decoded, args.java, apktool, args.offline)
         keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
         options = {'dpad': True} if args.input_probe == 'additive-dpad' else {}
+        if args.input_probe == 'spatial-navigation': options={'spatial':True}
         keys.write_text(smali_probe(keys.read_text(), **options))
     raw = work / 'CarCast-0.3.25-cn-unsigned.apk'
     run(args.java, '-jar', apktool, 'b', decoded, '-o', raw)
@@ -141,7 +142,7 @@ def main() -> int:
     candidate = output / f'CarCast-0.3.25-{args.label}-unsigned.apk'
     run(sys.executable, work / stages[-1], '--source', work / 'CarCast-0.3.25-cn-knob-unsigned.apk',
         '--output', candidate)
-    if args.input_probe and args.input_probe not in {'axis-nudge', 'spatial-focus'}:
+    if args.input_probe and args.input_probe not in {'axis-nudge', 'spatial-focus', 'spatial-navigation'}:
         probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
         run(sys.executable, ROOT / 'experiments' / (probes[args.input_probe] + '.py'),
             '--source', candidate, '--output', probe,

@@ -5,7 +5,7 @@ import shutil
 ROOT=Path(__file__).resolve().parents[1]
 
 
-def smali_probe(source):
+def smali_probe(source, spatial=False):
     anchor='    # Xiaomi BLE voice key is F12. F1 is a keyboard diagnostic alias.'
     if source.count(anchor)!=1: raise ValueError('Unexpected key handler')
     prefix='''    const/16 v0, 0x84
@@ -63,6 +63,49 @@ def smali_probe(source):
     return v0
     :focus_probe_original
 '''
+    prefix=prefix.replace('Lai/rplay/carcast/CnFocusProbe;->cancel()V',
+                          'Lai/rplay/carcast/CnSpatialNavigator;->cancel()V')
+    if spatial:
+        stop='''    const/4 v0, 0x4
+    if-eq p1, v0, :spatial_explicit_cancel
+    const/16 v0, 0x52
+    if-eq p1, v0, :spatial_explicit_cancel
+    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->stop()V
+    goto :focus_probe_original
+    :spatial_explicit_cancel
+'''
+        marker='''    if-nez v0, :focus_probe_original
+    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->cancel()V
+    goto :focus_probe_original'''
+        replacement='''    if-nez v0, :focus_probe_original
+'''+stop+'''    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->cancel()V
+    goto :focus_probe_original'''
+        if prefix.count(marker)!=1:raise ValueError('Unexpected unrelated-key cancellation')
+        prefix=prefix.replace(marker,replacement)
+        gate='''    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->busy()Z
+    move-result v0
+    if-nez v0, :focus_probe_consumed
+    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->uncertain()Z
+    move-result v0
+    if-nez v0, :focus_probe_consumed
+'''
+        prefix=prefix.replace('    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->busy()Z',
+                              gate+'    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->busy()Z')
+        directions='''    const/16 v0, 0x13
+    if-lt p1, v0, :spatial_diagnostic
+    const/16 v0, 0x16
+    if-gt p1, v0, :spatial_diagnostic
+    invoke-virtual {p2}, Landroid/view/KeyEvent;->getAction()I
+    move-result v0
+    if-nez v0, :focus_probe_consumed
+    invoke-virtual {p2}, Landroid/view/KeyEvent;->getRepeatCount()I
+    move-result v0
+    if-nez v0, :focus_probe_consumed
+    invoke-static {p1}, Lai/rplay/carcast/CnSpatialNavigator;->request(I)V
+    goto :focus_probe_consumed
+    :spatial_diagnostic
+'''
+        prefix=directions+prefix
     return source.replace(anchor,prefix+anchor)
 
 
@@ -79,7 +122,7 @@ def patch_helpers(decoded, java, apktool, offline):
     source=decoded/'smali/ai/rplay/carcast/CnInput.smali'
     text=source.read_text();anchor='.method public static cancel()V\n    .locals 4'
     if text.count(anchor)!=1: raise ValueError('Unexpected input cancellation baseline')
-    text=text.replace(anchor,anchor+'\n    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->cancel()V')
+    text=text.replace(anchor,anchor+'\n    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->stop()V')
     text=text.replace('.field private wheel:I','.field private wheel:I\n.field private probeToken:I\n.field private static held:I')
     marker='    invoke-direct {v3, p1, p2, p3}, Lai/rplay/carcast/CnInput;-><init>(III)V'
     if text.count(marker)!=1: raise ValueError('Unexpected input report constructor')
@@ -120,3 +163,9 @@ def patch_helpers(decoded, java, apktool, offline):
 .end method
 '''
     source.write_text(text)
+    bridge=decoded/'smali/ai/rplay/carcast/NativeBridge.smali'
+    text=bridge.read_text()
+    marker='    invoke-static {}, Lai/rplay/carcast/CnReconnect;->cancel()V'
+    if text.count(marker)!=1:raise ValueError('Unexpected primary-screen connection boundary')
+    text=text.replace(marker,marker+'\n    invoke-static {}, Lai/rplay/carcast/CnSpatialNavigator;->cancel()V')
+    bridge.write_text(text)

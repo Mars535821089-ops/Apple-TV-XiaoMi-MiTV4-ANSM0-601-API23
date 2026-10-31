@@ -2,6 +2,10 @@ import ai.rplay.carcast.CnFocusProbe;
 import ai.rplay.carcast.CnProbeHost;
 import java.util.Arrays;
 public final class FocusProbeTest {
+    private static final class Result implements CnFocusProbe.Completion {
+        int count; int[] from,to;
+        public void complete(int[] a,int[] b){count++;from=a;to=b;}
+    }
     private static int[] selected(int top){int[] a=new int[320*180];Arrays.fill(a,0xff202020);for(int y=top;y<top+22;y++)for(int x=80;x<250;x++)a[y*320+x]=0xffeeeeee;return a;}
     private static void check(boolean b,String m){if(!b)throw new AssertionError(m);}
     private static void reset(){CnFocusProbe.cancel();CnProbeHost.reset();}
@@ -32,6 +36,17 @@ public final class FocusProbeTest {
         check(CnProbeHost.inputs==0&&!CnFocusProbe.busy(),"capture allocation failure must not crash or send input");
         start();CnProbeHost.failFrame=true;CnProbeHost.clock=1300;CnProbeHost.tick();
         check(!CnFocusProbe.busy(),"analysis-frame allocation failure must cancel safely");
-        System.out.println("PASS: focus probe freshness, queue ownership, concurrent cancellation, allocation and timeout contracts");
+        reset();CnProbeHost.pixels=selected(40);Result result=new Result();
+        check(CnFocusProbe.request(1,result),"navigation must be able to start one observed step");
+        CnProbeHost.pixels=selected(80);CnProbeHost.serial=2;CnProbeHost.clock=1300;CnProbeHost.tick();
+        CnProbeHost.clock=1500;CnProbeHost.tick();
+        check(result.count==1 && result.from[1]==40 && result.to[1]==80,"observed step must return actual old and new focus");
+        reset();CnProbeHost.pixels=selected(40);result=new Result();CnFocusProbe.request(1,result);
+        CnProbeHost.clock=3301;CnProbeHost.tick();
+        check(result.count==1 && result.from==null && result.to==null,"timeout must report an unknown step rather than inventing position");
+        reset();CnProbeHost.pixels=selected(40);result=new Result();CnFocusProbe.request(1,result);
+        Runnable late=CnProbeHost.pending;CnFocusProbe.cancel();late.run();
+        check(result.count==0,"external cancellation must not continue a navigation path");
+        System.out.println("PASS: focus probe freshness, queue ownership, concurrent cancellation, allocation, timeout and observed-step contracts");
     }
 }

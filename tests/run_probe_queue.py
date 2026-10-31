@@ -85,7 +85,13 @@ def main():
  decoded=ROOT/'build/work/carcast-cn-src';project=ROOT/'build/probe-queue';package=project/'smali/ai/rplay/carcast';package.mkdir(parents=True,exist_ok=True)
  for name in ('apktool.yml','AndroidManifest.xml'):shutil.copy2(decoded/name,project/name)
  for name in ('CnHold','CnInput','CnSiri'):shutil.copy2(decoded/f'smali/ai/rplay/carcast/{name}.smali',package/f'{name}.smali')
- for name,body in {'SettingsActivity':SESSION,'NativeBridge':SINK,'CnFocusProbe':PROBE,'ProbeQueueMain':MAIN}.items():
+ nav='''.method public static stop()V
+.locals 0
+invoke-static {},Lai/rplay/carcast/CnFocusProbe;->cancel()V
+return-void
+.end method
+'''
+ for name,body in {'SettingsActivity':SESSION,'NativeBridge':SINK,'CnFocusProbe':PROBE,'CnSpatialNavigator':nav,'ProbeQueueMain':MAIN}.items():
   (package/f'{name}.smali').write_text(HEADER.format(name=name,superclass='Ljava/lang/Object;')+body)
  apk,dex=ROOT/'build/probe-queue.apk',ROOT/'build/probe-queue.dex'
  subprocess.run([a.java,'-jar',a.apktool,'b',str(project),'-o',str(apk)],check=True)

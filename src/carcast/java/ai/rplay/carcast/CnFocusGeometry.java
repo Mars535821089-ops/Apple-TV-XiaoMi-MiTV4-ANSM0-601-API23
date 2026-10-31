@@ -5,6 +5,19 @@ package ai.rplay.carcast;
  */
 public final class CnFocusGeometry {
     private CnFocusGeometry() {}
+    /** Conservative continuity guard, not a semantic button/page identity. */
+    public static boolean sameScene(int[] before,int[] after,int width,int height,int[] from,int[] to) {
+        if(before==null || after==null || before.length!=width*height || after.length!=before.length
+            || from==null || to==null || from.length<4 || to.length<4) return false;
+        int changed=0,area=0;
+        for(int y=0;y<height;y++)for(int x=width/10;x<width;x++) {
+            if(inside(x,y,from)||inside(x,y,to))continue;
+            area++;int i=y*width+x;
+            if(Math.abs(luma(before[i])-luma(after[i]))>=28)changed++;
+        }
+        return area>0 && changed*100L<=area*4L;
+    }
+    private static boolean inside(int x,int y,int[] r){return x>=r[0]-4 && x<r[2]+4 && y>=r[1]-4 && y<r[3]+4;}
 
     private static int luma(int color) {
         return (((color >>> 16) & 255)*77 + ((color >>> 8) & 255)*150 + (color & 255)*29) >>> 8;

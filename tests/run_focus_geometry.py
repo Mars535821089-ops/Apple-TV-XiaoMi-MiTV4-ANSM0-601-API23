@@ -16,9 +16,10 @@ def run(java):
     classes=ROOT/'build/focus-host-tests';classes.mkdir(parents=True,exist_ok=True)
     sources=[*sorted((ROOT/'src/carcast/java').rglob('*.java')),
              ROOT/'tests/fakes/ai/rplay/carcast/CnProbeHost.java',
-             ROOT/'tests/java/FocusGeometryTest.java',ROOT/'tests/java/FocusProbeTest.java']
+             ROOT/'tests/java/FocusGeometryTest.java',ROOT/'tests/java/FocusProbeTest.java',
+             ROOT/'tests/java/SpatialPathTest.java',ROOT/'tests/java/SpatialNavigatorTest.java']
     subprocess.run([java,'-jar',str(ecj),'-1.8','-proc:none','-g:none','-d',str(classes),*map(str,sources)],check=True)
-    for name in ('FocusGeometryTest','FocusProbeTest'):
+    for name in ('FocusGeometryTest','FocusProbeTest','SpatialPathTest','SpatialNavigatorTest'):
         subprocess.run([java,'-cp',str(classes),name],check=True)
 
 

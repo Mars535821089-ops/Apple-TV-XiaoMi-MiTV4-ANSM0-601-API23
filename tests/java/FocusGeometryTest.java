@@ -44,6 +44,11 @@ public final class FocusGeometryTest {
         if(ring==null || ring[0]!=80 || ring[1]!=80 || ring[2]!=140 || ring[3]!=130)
             throw new AssertionError("thin focus outline around a colored icon must be recognized");
         cases++;
+        a=frame();b=frame();box(a,80,40,250,62,LIGHT);box(b,80,80,250,102,LIGHT);
+        int[] from={80,40,250,62},to={80,80,250,102};
+        if(!CnFocusGeometry.sameScene(a,b,W,H,from,to)) throw new AssertionError("focus change inside known controls must preserve scene");
+        box(b,40,115,310,170,0xffb0b0b0);
+        if(CnFocusGeometry.sameScene(a,b,W,H,from,to)) throw new AssertionError("changed page content outside focus cannot be treated as same scene");
         System.out.println("PASS: "+cases+" focus geometry cases");
     }
 }
