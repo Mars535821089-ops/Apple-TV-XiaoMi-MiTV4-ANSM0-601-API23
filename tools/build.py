@@ -16,7 +16,7 @@ import urllib.request
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_LABEL = 'audit15-no-legacy-cursor'
+DEFAULT_LABEL = 'audit16-observe-frame-silence'
 
 
 def digest(path: Path) -> str:
@@ -88,7 +88,7 @@ def main() -> int:
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle'}:
+    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor'}:
         parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')

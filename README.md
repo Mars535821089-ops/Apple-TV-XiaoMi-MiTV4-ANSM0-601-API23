@@ -44,8 +44,8 @@ export TV_SERIAL='电视IP:5555'
 adb -P 5040 connect "$TV_SERIAL"
 python3 tools/device.py status
 python3 tools/device.py install \
-  --apk build/outputs/CarCast-0.3.25-audit15-no-legacy-cursor-aligned-debugSigned.apk \
-  --receipt build/outputs/audit15-no-legacy-cursor.json
+  --apk build/outputs/CarCast-0.3.25-audit16-observe-frame-silence-aligned-debugSigned.apk \
+  --receipt build/outputs/audit16-observe-frame-silence.json
 python3 tools/device.py launch carcast
 ```
 
@@ -76,6 +76,13 @@ python3 tools/check_public_sources.py
 
 ## 输入生命周期回归
 
-当前默认构建标签为`audit15-no-legacy-cursor`，删除未使用的旧光标入口并保留audit12的输入生命周期修复；新候选尚未安装验收。audit12已完成长按相关实测，修复退到后台、失去焦点及会话结束时的长按/排队输入清理；四向空间导航仍未完成。audit11历史回退包保留，不覆盖其文件。声音与ADB最终验收按用户安排留到其他兼容项完成后。
+当前默认构建标签为`audit16-observe-frame-silence`，保留audit12输入清理和audit15旧光标清理，并撤除仅因画面回调静默便主动断开的规则；新候选尚未安装验收。audit12已完成长按相关实测，修复退到后台、失去焦点及会话结束时的长按/排队输入清理；四向空间导航仍未完成。audit11历史回退包保留，不覆盖其文件。声音与ADB最终验收按用户安排留到其他兼容项完成后。
 
 `tests/run_input_lifecycle.py`在电视独立shell进程运行实际输入辅助类和构建产物中的onPause方法，使用真实Android Looper/Handler/Activity；只有会话标志和原生报告接收端被隔离替身替代，不安装应用，也不向手机发送按键。两个回归分别验证长按任务和排队按键在onPause之后不再产生非中立报告，修复前都失败、修复后都通过。它不代替真实应用长按、方向或跨应用验收。
+
+## 画面静默与会话恢复
+
+旧画面监视器在TextureView超过120秒没有新回调时主动调用`teardownSession`。
+已保留的实机记录出现149683ms后主动结束会话、随后再连的完整顺序；这不是应用崩溃的证据，也不能解释所有用户报告的退出。
+画面静默本身不足以判断无线传输失效。audit16只记录帧龄与帧数，不再据此拆断连接；原厂SDK真实会话结束后的重连钩子保留。
+`test_render_safety.py`是禁止画面观察器主动拆断传输的静态边界检查，修复前失败、修复后通过；不冒充真实静止画面或故障恢复验收。

@@ -5,7 +5,6 @@
 
 .field private static current:Lai/rplay/carcast/CnRender;
 .field private static output:Landroid/view/Surface;
-.field private static recoveries:I
 .field private watch:Landroid/os/Handler;
 .field private lastFrame:J
 .field private frames:J
@@ -158,44 +157,9 @@
     move-result-object v4
     const-string v5, "CnFrameHealth"
     invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
-    invoke-virtual {p0}, Landroid/view/View;->hasWindowFocus()Z
-    move-result v4
-    if-eqz v4, :inactive
-    invoke-virtual {p0}, Landroid/view/View;->isShown()Z
-    move-result v4
-    if-eqz v4, :inactive
-    invoke-static {}, Lai/rplay/carcast/SettingsActivity;->g()Z
-    move-result v4
-    if-eqz v4, :inactive
-    invoke-virtual {p0}, Landroid/view/View;->getContext()Landroid/content/Context;
-    move-result-object v4
-    const-string v5, "power"
-    invoke-virtual {v4, v5}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
-    move-result-object v4
-    check-cast v4, Landroid/os/PowerManager;
-    invoke-virtual {v4}, Landroid/os/PowerManager;->isInteractive()Z
-    move-result v4
-    if-eqz v4, :inactive
-    const-wide/32 v4, 0x1d4c0
-    cmp-long v4, v2, v4
-    if-lez v4, :again
-    sget v4, Lai/rplay/carcast/CnRender;->recoveries:I
-    const/4 v5, 0x3
-    if-ge v4, v5, :again
-    add-int/lit8 v4, v4, 0x1
-    sput v4, Lai/rplay/carcast/CnRender;->recoveries:I
-    iput-wide v0, p0, Lai/rplay/carcast/CnRender;->lastFrame:J
-    const-string v4, "CnFrameHealth"
-    const-string v5, "Visible CarPlay video stalled; requesting session recovery"
-    invoke-static {v4, v5}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
-    invoke-static {}, Lai/rplay/carcast/NativeBridge;->teardownSession()V
-    invoke-virtual {p0}, Landroid/view/View;->getContext()Landroid/content/Context;
-    move-result-object v4
-    invoke-static {v4}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V
-    goto :again
-    :inactive
-    iput-wide v0, p0, Lai/rplay/carcast/CnRender;->lastFrame:J
-    :again
+    # A static phone UI or a missing TextureView callback does not prove the
+    # session is dead. Keep this observer read-only with respect to transport;
+    # genuine SDK session-ended events retain their existing reconnect path.
     invoke-direct {p0}, Lai/rplay/carcast/CnRender;->schedule()V
     :done
     return-void

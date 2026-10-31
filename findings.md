@@ -40,3 +40,7 @@
 - 新的additive-menu诊断保留原X/Y、wheel、Select/Home/Back/Voice字段及其位偏移、逻辑范围和标记；仅使用bit4..7空白位表达Consumer Menu方向。与此前替换X/Y的失败候选区分。报告仍32bit，描述符76字节，放入项目自有RX桥后的既有零填充并扩展该映射长度。原始指针、长度、分配及复制在两个装载基址通过；这是宿主证明，不是iPhone接受证明。
 
 - 输入生命周期缺陷已有独立复现和修复证据：真实输入辅助类及构建onPause方法在API23隔离进程运行，修复前长按/排队输入退出后继续发送，修复后均停止。安装audit12后长按释放、长按中回Aerial均未继续非中立注入。原生结束回调只清理并排队中立释放，不在SDK回调线程直接调用原生报告发送。
+
+- 发现另一处可定位的主动断连：已有安装版日志在TextureView累计5帧、frameAgeMs=149683时输出“Visible CarPlay video stalled”，随后screen stop和session disconnected，再约15秒后重连。该顺序证明监视器主动拆断会话，不能据此认定真实链路已经失效，也不是所有点击退出的统一根因。
+- audit16将画面监视器限制为记录，不再根据帧回调静默执行teardownSession或CnReconnect.start；SDK onCarPlayEnded既有重连路径保留。静态安全边界先红后绿、完整20项测试通过；候选未安装，静止画面、真正断线及跨应用恢复仍待实机。
+- 四向协议研究现阶段仍未突破：原旋钮轴/步进、Consumer Menu及Generic Desktop D-pad均未达到需求。标准字段存在不等于iPhone接受，禁止继续把更多未经证明的Usage数值当修复方案。原厂primaryInputDevice与HID设备构造已定位，尚未证明存在可用的新空间导航入口。
