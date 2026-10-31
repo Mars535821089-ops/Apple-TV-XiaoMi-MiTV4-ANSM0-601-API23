@@ -2,32 +2,59 @@ package ai.rplay.carcast;
 
 /** Bounded diagnostic only: one rotary step, then text geometry, never Select. */
 public final class CnFocusProbe implements Runnable {
+    private static final Object LOCK=new Object();
     private static volatile CnFocusProbe current;
-    private int[] before;
-    private int[] candidate;
-    private long started, baselineVersion, candidateVersion;
-    private int wheel;
-    private final int[] stats=new int[8];
-    private long observedVersion;
+    private static int epoch, nextToken=0x1000;
+    private int[] before, candidate;
+    private final int[] stats=new int[24];
+    private long started, baselineVersion, candidateVersion, observedVersion, settledSince;
+    private int wheel, token;
 
     private CnFocusProbe() {}
     public static boolean busy() { return current!=null; }
+    public static boolean validToken(int token) {
+        synchronized(LOCK) { CnFocusProbe p=current; return p!=null && p.token==token; }
+    }
     public static void cancel() {
-        CnProbeHost.clear();
-        if(current!=null) current.before=null;
-        current=null;
+        synchronized(LOCK) {
+            epoch++;
+            CnFocusProbe p=current;current=null;
+            CnProbeHost.clear();
+            if(p!=null) p.before=null;
+        }
+    }
+    private void finish(String message) {
+        synchronized(LOCK) {
+            if(current!=this) return;
+            cancel();
+            CnProbeHost.log(message);
+        }
     }
     public static void request(int direction) {
-        if(current!=null || (direction!=-1 && direction!=1)) return;
-        CnFocusProbe p=new CnFocusProbe();
-        p.before=CnProbeHost.frame();
-        if(p.before==null) { CnProbeHost.log("unavailable frame; no input sent"); return; }
-        p.wheel=direction;
-        p.started=CnProbeHost.now();
-        p.baselineVersion=CnProbeHost.version();
-        current=p;
-        CnProbeHost.send(direction);
-        CnProbeHost.post(p,250);
+        final int stamp;
+        synchronized(LOCK) {
+            if(current!=null || (direction!=-1 && direction!=1) || !CnProbeHost.ready()) return;
+            stamp=epoch;
+        }
+        CnFocusProbe p=null;
+        try {
+            p=new CnFocusProbe();p.before=CnProbeHost.frame();
+            if(p.before==null) {
+                synchronized(LOCK) { if(epoch==stamp && current==null) CnProbeHost.log("unavailable frame; no input sent"); }
+                return;
+            }
+            p.wheel=direction;p.started=CnProbeHost.now();p.baselineVersion=CnProbeHost.version();
+            synchronized(LOCK) {
+                if(epoch!=stamp || current!=null || !CnProbeHost.ready()) return;
+                if(++nextToken<0x1000) nextToken=0x1000;
+                p.token=nextToken;current=p;
+                // Only enqueue here, never call native transport while holding LOCK.
+                CnProbeHost.send(direction,p.token);
+                CnProbeHost.post(p,250);
+            }
+        } catch(OutOfMemoryError failure) {
+            if(p!=null) p.finish("probe allocation failed; cancelled");
+        }
     }
     private static boolean same(int[] a,int[] b) {
         if(a==null || b==null) return false;
@@ -36,24 +63,30 @@ public final class CnFocusProbe implements Runnable {
     }
     public void run() {
         if(current!=this) return;
-        long elapsed=CnProbeHost.now()-started;
-        if(elapsed>2200) { CnProbeHost.log("no stable focus wheel="+wheel+" baseline="+baselineVersion+" observed="+observedVersion
-                +" candidateVersion="+candidateVersion+" changed="+stats[0]+" best="+stats[1]+" second="+stats[2]
-                +" bounds="+stats[3]+","+stats[4]+","+stats[5]+","+stats[6]+" fill="+stats[7]); cancel(); return; }
-        long version=CnProbeHost.version();
-        observedVersion=version;
-        int[] after=CnProbeHost.frame();
-        if(after==null) { CnProbeHost.log("frame lost; probe cancelled");cancel();return; }
-        if(version>baselineVersion) {
-            int[] found=CnFocusGeometry.analyze(before,after,320,180,stats);
-            if(found!=null && same(candidate,found) && version!=candidateVersion) {
-                CnProbeHost.log("rect="+found[0]+","+found[1]+","+found[2]+","+found[3]
-                    +" confidence="+found[4]+" elapsedMs="+elapsed+" wheel="+wheel);
-                cancel(); return;
+        try {
+            long elapsed=CnProbeHost.now()-started;
+            if(elapsed>2200) {
+                finish("no stable focus wheel="+wheel+" baseline="+baselineVersion+" observed="+observedVersion
+                    +" candidateVersion="+candidateVersion+" changed="+stats[0]+" best="+stats[1]+" second="+stats[2]
+                    +" bounds="+stats[3]+","+stats[4]+","+stats[5]+","+stats[6]+" fill="+stats[7]
+                    +" mask="+stats[8]+" raw="+stats[9]+","+stats[10]+","+stats[11]+","+stats[12]+","+stats[13]+","+stats[14]
+                    +" edge="+stats[15]+" luma="+stats[16]+","+stats[17]+","+stats[18]+","+stats[19]+","+stats[20]+","+stats[21]+","+stats[22]+","+stats[23]);return;
             }
-            candidate=found;
-            candidateVersion=version;
+            long version=CnProbeHost.version();observedVersion=version;
+            int[] after=CnProbeHost.frame();
+            if(after==null) { finish("frame lost; probe cancelled");return; }
+            if(version>baselineVersion) {
+                int[] found=CnFocusGeometry.analyze(before,after,320,180,stats);
+                if(found!=null && same(candidate,found) && elapsed-settledSince>=150) {
+                    finish("rect="+found[0]+","+found[1]+","+found[2]+","+found[3]
+                        +" confidence="+found[4]+" elapsedMs="+elapsed+" wheel="+wheel);return;
+                }
+                if(!same(candidate,found)) settledSince=elapsed;
+                candidate=found;candidateVersion=version;
+            }
+            synchronized(LOCK) { if(current==this) CnProbeHost.post(this,100); }
+        } catch(OutOfMemoryError failure) {
+            finish("analysis allocation failed; probe cancelled");
         }
-        CnProbeHost.post(this,100);
     }
 }

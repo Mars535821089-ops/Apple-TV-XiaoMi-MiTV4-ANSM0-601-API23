@@ -34,6 +34,16 @@ public final class FocusGeometryTest {
         none(null,b,"missing before frame");
         if(CnFocusGeometry.analyze(new int[2],new int[2],320,180)!=null) throw new AssertionError("invalid dimensions");
         cases++;
+        a=frame();b=frame();box(a,40,28,312,56,LIGHT);box(b,40,56,312,84,LIGHT);
+        int[] wide=CnFocusGeometry.analyze(a,b,W,H);
+        if(wide==null || wide[0]!=40 || wide[1]!=56 || wide[2]!=312 || wide[3]!=84)
+            throw new AssertionError("adjacent full-width list rows must not look like a page transition");
+        cases++;
+        a=frame();b=frame();box(b,80,80,140,130,LIGHT);box(b,82,82,138,128,0xff18a830);
+        int[] ring=CnFocusGeometry.analyze(a,b,W,H);
+        if(ring==null || ring[0]!=80 || ring[1]!=80 || ring[2]!=140 || ring[3]!=130)
+            throw new AssertionError("thin focus outline around a colored icon must be recognized");
+        cases++;
         System.out.println("PASS: "+cases+" focus geometry cases");
     }
 }

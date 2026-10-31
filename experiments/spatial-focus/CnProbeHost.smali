@@ -20,12 +20,11 @@
  move-result-wide v0
  return-wide v0
 .end method
-.method public static send(I)V
+.method public static send(II)V
  .locals 2
- const/16 v0,0x100
  const/4 v1,0x0
- invoke-static {v0,v1,v1,p0},Lai/rplay/carcast/CnInput;->enqueue(IIII)V
- invoke-static {v0,v1,v1,v1},Lai/rplay/carcast/CnInput;->enqueue(IIII)V
+ invoke-static {p1,v1,v1,p0},Lai/rplay/carcast/CnInput;->enqueue(IIII)V
+ invoke-static {p1,v1,v1,v1},Lai/rplay/carcast/CnInput;->enqueue(IIII)V
  return-void
 .end method
 .method public static post(Ljava/lang/Runnable;J)V
@@ -55,4 +54,11 @@
  const-string v0,"CnFocusProbe"
  invoke-static {v0,p0},Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
  return-void
+.end method
+
+.method public static ready()Z
+ .locals 1
+ invoke-static {},Lai/rplay/carcast/CnInput;->canProbe()Z
+ move-result v0
+ return v0
 .end method

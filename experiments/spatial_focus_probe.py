@@ -20,7 +20,7 @@ def smali_probe(source):
     const/16 v0, 0x42
     if-eq p1, v0, :focus_probe_select
     const/16 v0, 0xa0
-    if-ne p1, v0, :focus_probe_original
+    if-ne p1, v0, :focus_probe_other
     :focus_probe_select
     invoke-virtual {p2}, Landroid/view/KeyEvent;->getAction()I
     move-result v0
@@ -29,6 +29,12 @@ def smali_probe(source):
     move-result v0
     if-eqz v0, :focus_probe_original
     goto :focus_probe_consumed
+    :focus_probe_other
+    invoke-virtual {p2}, Landroid/view/KeyEvent;->getAction()I
+    move-result v0
+    if-nez v0, :focus_probe_original
+    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->cancel()V
+    goto :focus_probe_original
     :focus_probe_next
     const/4 v1, 0x1
     goto :focus_probe_request
@@ -73,4 +79,44 @@ def patch_helpers(decoded, java, apktool, offline):
     source=decoded/'smali/ai/rplay/carcast/CnInput.smali'
     text=source.read_text();anchor='.method public static cancel()V\n    .locals 4'
     if text.count(anchor)!=1: raise ValueError('Unexpected input cancellation baseline')
-    source.write_text(text.replace(anchor,anchor+'\n    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->cancel()V'))
+    text=text.replace(anchor,anchor+'\n    invoke-static {}, Lai/rplay/carcast/CnFocusProbe;->cancel()V')
+    text=text.replace('.field private wheel:I','.field private wheel:I\n.field private probeToken:I\n.field private static held:I')
+    marker='    invoke-direct {v3, p1, p2, p3}, Lai/rplay/carcast/CnInput;-><init>(III)V'
+    if text.count(marker)!=1: raise ValueError('Unexpected input report constructor')
+    text=text.replace(marker,marker+'\n    iput p0, v3, Lai/rplay/carcast/CnInput;->probeToken:I')
+    text=text.replace('.method public run()V\n    .locals 6', '''.method public run()V
+    .locals 6
+    iget v0, p0, Lai/rplay/carcast/CnInput;->probeToken:I
+    const/16 v1, 0x100
+    if-eq v0, v1, :probe_regular
+    invoke-static {v0}, Lai/rplay/carcast/CnFocusProbe;->validToken(I)Z
+    move-result v0
+    if-eqz v0, :done
+    :probe_regular''')
+    marker='    invoke-static {v0, v1, v2, v3}, Lai/rplay/carcast/NativeBridge;->iapPointer(IIII)V'
+    text=text.replace(marker,marker+'\n    or-int v4, v1, v2\n    sput v4, Lai/rplay/carcast/CnInput;->held:I')
+    text+='''
+.method public static canProbe()Z
+ .locals 5
+ sget-object v0,Lai/rplay/carcast/CnInput;->handler:Landroid/os/Handler;
+ if-eqz v0,:state
+ const/4 v1,0x0
+ invoke-virtual {v0,v1},Landroid/os/Handler;->hasMessages(I)Z
+ move-result v0
+ if-nez v0,:busy
+ :state
+ sget v0,Lai/rplay/carcast/CnInput;->held:I
+ if-nez v0,:busy
+ sget-wide v0,Lai/rplay/carcast/CnInput;->next:J
+ invoke-static {},Landroid/os/SystemClock;->uptimeMillis()J
+ move-result-wide v2
+ cmp-long v4,v0,v2
+ if-gtz v4,:busy
+ const/4 v0,0x1
+ return v0
+ :busy
+ const/4 v0,0x0
+ return v0
+.end method
+'''
+    source.write_text(text)
