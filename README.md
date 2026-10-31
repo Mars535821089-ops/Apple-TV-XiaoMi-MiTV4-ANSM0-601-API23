@@ -1,5 +1,9 @@
 # Carplay-XiaoMi MiTV4-ANSM0-601-API23
 
+> **CarPlay adaptation is shelved at the user's request (2026-11-01). Do not resume development, device testing or deployment without a new user request. This is not a completed compatibility release.**
+> See [current delivery status](docs/DELIVERY_STATUS.md) for the separate desktop, Hongguo and ADB results.
+
+
 小米 MiTV4-ANSM0（Android 6.0.1 / API23 / ARM32）的电视 CarPlay 适配补丁、构建工具和实机验收记录。
 
 **开发中，尚未完成全方位适配。当前候选的上下键仍可能横移，不是最终交付版本。**

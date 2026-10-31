@@ -1,5 +1,9 @@
 # 小米电视 CarPlay 全方位适配计划
 
+> **CarPlay adaptation is shelved at the user's request (2026-11-01). Do not resume development, device testing or deployment without a new user request. This is not a completed compatibility release.**
+> See [current delivery status](docs/DELIVERY_STATUS.md) for the separate desktop, Hongguo and ADB results.
+
+
 目标：MiTV4-ANSM0 / Android 6.0.1 / API23 的完整电视体验适配、逐项验收与可重复部署源码交付。保留电视系统、原授权、用户数据、Wi-Fi、电脑代理与路由。
 
 ## 当前事实

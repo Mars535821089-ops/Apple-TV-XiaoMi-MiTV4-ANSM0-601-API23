@@ -164,3 +164,7 @@ Independent review found a cleanup bug when a valid reservation is address0; add
 Candidate audit44 SHA2563234fbf577f9ecef4bb74f5e1868195df4ce09844d117d1f5dd87c56d668361b is in one-time installation; verify the pending receipt before retrying. This proves the old-kernel allocation fix, not telephony audio quality, Siri, direction reliability or full session acceptance. Default remains audit38 pending live app evidence.
 
 Hongguo MPV0.2.136 was installed and launched, installed-byte check passed. Real playback, sound and full remote traversal were not accepted; its successful install does not advance CarPlay completion.
+
+## User-directed closeout - 2026-11-01
+
+CarPlay adaptation SHELVED. Goal remains paused, not achieved. No further adaptation tests, code changes or deployment are authorized by this status question. Owned preview/monitor stopped and CarCast force-stopped; Aerial foreground verified again. Aerial1.74 and Hongguo MPV0.2.136 installed. Aerial startup/Home/icon labels were previously confirmed; Hongguo complete playback/remote/audio acceptance, persistent ADB reboot-duration acceptance and full AirPlay/mirroring acceptance remain unverified. See docs/DELIVERY_STATUS.md. Do not describe the entire non-CarPlay scope as fully accepted.

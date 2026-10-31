@@ -1,5 +1,9 @@
 # 全方位验收清单
 
+> **CarPlay adaptation is shelved at the user's request (2026-11-01). Do not resume development, device testing or deployment without a new user request. This is not a completed compatibility release.**
+> See [current delivery status](docs/DELIVERY_STATUS.md) for the separate desktop, Hongguo and ADB results.
+
+
 状态：通过 / 失败 / 部分通过 / 待测 / 需手机权限。代码或仿真通过不代表实机通过。每项记录触发、预期、实际、接收进程是否存活、会话是否保留，以及证据来源；不保存截图或录像。
 
 ## 验收矩阵
