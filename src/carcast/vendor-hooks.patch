@@ -48,20 +48,39 @@
 +    return v0
  .end method
  
-@@ -2347,5 +2375,5 @@
+@@ -2256,4 +2284,6 @@
+     .locals 2
+ 
++    invoke-static {}, Lai/rplay/carcast/CnInput;->cancel()V
++
+     .line 1
+     iget-object v0, p0, Lai/rplay/carcast/CarPlayActivity;->e:Lqp;
+@@ -2347,5 +2377,5 @@
  
      .line 6
 -    invoke-static {v1, v0}, Lai/rplay/carcast/NativeBridge;->setScreenSurface(ILandroid/view/Surface;)V
 +    invoke-static {v1, v0}, Lai/rplay/carcast/CnRender;->route(ILandroid/view/Surface;)V
  
      .line 7
-@@ -2378,5 +2406,5 @@
+@@ -2378,5 +2408,5 @@
  
      .line 3
 -    invoke-static {p1, v0}, Lai/rplay/carcast/NativeBridge;->setScreenSurface(ILandroid/view/Surface;)V
 +    invoke-static {p1, v0}, Lai/rplay/carcast/CnRender;->route(ILandroid/view/Surface;)V
  
      .line 4
+@@ -2390,2 +2420,11 @@
+     return-void
+ .end method
++
++.method public onWindowFocusChanged(Z)V
++    .locals 0
++    invoke-super {p0, p1}, Landroid/app/Activity;->onWindowFocusChanged(Z)V
++    if-nez p1, :done
++    invoke-static {}, Lai/rplay/carcast/CnInput;->cancel()V
++    :done
++    return-void
++.end method
 --- a/smali/ai/rplay/carcast/CarPlayService.smali
 +++ b/smali/ai/rplay/carcast/CarPlayService.smali
 @@ -4764,4 +4764,6 @@
@@ -96,9 +115,11 @@
      .line 223
 --- a/smali/ai/rplay/carcast/NativeBridge.smali
 +++ b/smali/ai/rplay/carcast/NativeBridge.smali
-@@ -561,4 +561,7 @@
+@@ -561,4 +561,9 @@
  .method public static onCarPlayEnded()V
      .locals 3
++
++    invoke-static {}, Lai/rplay/carcast/CnInput;->cancel()V
 +
 +    sget-object v0, Lai/rplay/carcast/CarPlayService;->A:Lai/rplay/carcast/CarPlayService;
 +    invoke-static {v0}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V

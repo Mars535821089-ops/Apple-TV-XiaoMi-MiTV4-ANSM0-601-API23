@@ -22,6 +22,7 @@ environment = os.environ.copy()
 environment['ADB'] = shutil.which(args.adb) or str(Path(args.adb).resolve())
 environment['ADB_SERVER_SOCKET'] = f'tcp:localhost:{args.server_port}'
 command = [args.scrcpy, '--serial', args.serial, '--no-audio', '--no-clipboard-autosync',
+           '--hwdec=disabled', '--render-driver=software',
            '--video-codec=h264', '--video-encoder=OMX.amlogic.video.encoder.avc',
            '--max-size=800', '--max-fps=8', '--video-bit-rate=768K',
            '--window-width=800', '--window-height=450', '--window-title=Mars电视配置']

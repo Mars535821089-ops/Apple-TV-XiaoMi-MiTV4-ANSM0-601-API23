@@ -51,6 +51,19 @@
     return-void
 .end method
 
+.method public static cancel()V
+    .locals 3
+    sget-object v0, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;
+    const/4 v1, 0x0
+    sput-object v1, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;
+    if-eqz v0, :done
+    sget-object v2, Lai/rplay/carcast/CnHold;->handler:Landroid/os/Handler;
+    if-eqz v2, :done
+    invoke-virtual {v2, v0}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
+    :done
+    return-void
+.end method
+
 .method public run()V
     .locals 6
     sget-object v0, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;

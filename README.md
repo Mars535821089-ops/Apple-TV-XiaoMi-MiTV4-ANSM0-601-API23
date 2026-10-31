@@ -2,7 +2,7 @@
 
 小米 MiTV4-ANSM0（Android 6.0.1 / API23 / ARM32）的电视 CarPlay 适配补丁、构建工具和实机验收记录。
 
-**开发中，尚未完成全方位适配。audit11 的上下键可能横移，不是最终交付版本。**
+**开发中，尚未完成全方位适配。当前候选的上下键仍可能横移，不是最终交付版本。**
 
 已确认：中文接收页面、16:9无线主画面、Aerial桌面、一次真实重启后自动进入Aerial，及用户确认的电视出声。仍未完成：真实四向、跨应用全部按钮、Siri、杂音、iPhone视频画面与电视音频同步及长期稳定性。详见 [完整验收矩阵](docs/ACCEPTANCE.md)。
 
@@ -33,7 +33,7 @@ Java需要在PATH中，或传 `--java /path/to/java`。原生桥接汇编使用 
 
 `--offline` 禁止下载；可用 `--upstream-apk`、`--apktool`、`--signer` 指定已有文件，仍会核对固定SHA256。大小写仅不同的原厂资源直接从原始ZIP保留，避免macOS文件系统碰撞。
 
-2026-10-31 已用本仓库源码从干净原厂基线完成重建；签名APK SHA256与电视当前audit11字节完全一致：`8a21cc7db6ea0499862385fab03d49b45d43654e3f7d0c172d983ab2ff068518`。这证明构建可重现，不代表audit11的方向问题已经解决。
+2026-10-31 已用本仓库源码从干净原厂基线完成重建；当时重建的签名APK SHA256与已安装audit11字节完全一致：`8a21cc7db6ea0499862385fab03d49b45d43654e3f7d0c172d983ab2ff068518`。这证明构建可重现，不代表audit11的方向问题已经解决。
 
 ## 已授权电视部署
 
@@ -44,8 +44,8 @@ export TV_SERIAL='电视IP:5555'
 adb -P 5040 connect "$TV_SERIAL"
 python3 tools/device.py status
 python3 tools/device.py install \
-  --apk build/outputs/CarCast-0.3.25-audit11-rebuild-aligned-debugSigned.apk \
-  --receipt build/outputs/audit11-rebuild.json
+  --apk build/outputs/CarCast-0.3.25-audit12-input-lifecycle-aligned-debugSigned.apk \
+  --receipt build/outputs/audit12-input-lifecycle.json
 python3 tools/device.py launch carcast
 ```
 
@@ -59,7 +59,7 @@ python3 tools/device.py launch aerial
 python3 tools/preview.py
 ```
 
-实时预览使用普通800×450窗口，不全屏，不生成截图或录像，不捕获电视音频。`SCRCPY_BINARY` / `ADB_BINARY` 可指向已有工具；本机验证使用scrcpy5.0.1。不要同时打开多个预览实例。
+实时预览使用普通800×450窗口，不全屏，不生成截图或录像，不捕获电视音频。当前本机采用软件解码和软件渲染，以排除硬件解码预览旧帧滞留；这不改变电视CarPlay的视频解码或音频输出。`SCRCPY_BINARY` / `ADB_BINARY` 可指向已有工具；本机验证使用scrcpy5.0.1。不要同时打开多个预览实例。
 
 ## 回退与验收
 
@@ -73,3 +73,9 @@ python3 tools/check_public_sources.py
 ```
 
 边界测试与原生指令仿真不能代替真实电视、手机和实体遥控器验收。
+
+## 输入生命周期回归
+
+当前默认构建标签为`audit12-input-lifecycle`，修复退到后台、失去焦点及会话结束时的长按/排队输入清理；四向空间导航仍未完成。audit11历史回退包保留，不覆盖其文件。声音与ADB最终验收按用户安排留到其他兼容项完成后。
+
+`tests/run_input_lifecycle.py`在电视独立shell进程运行实际输入辅助类和构建产物中的onPause方法，使用真实Android Looper/Handler/Activity；只有会话标志和原生报告接收端被隔离替身替代，不安装应用，也不向手机发送按键。两个回归分别验证长按任务和排队按键在onPause之后不再产生非中立报告，修复前都失败、修复后都通过。它不代替真实应用长按、方向或跨应用验收。

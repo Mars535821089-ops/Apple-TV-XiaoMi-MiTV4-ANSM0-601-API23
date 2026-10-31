@@ -59,8 +59,34 @@
     return-void
 .end method
 
+.method public static cancel()V
+    .locals 4
+    invoke-static {}, Lai/rplay/carcast/CnHold;->cancel()V
+    invoke-static {}, Lai/rplay/carcast/CnSiri;->cancel()V
+    sget-object v0, Lai/rplay/carcast/CnInput;->handler:Landroid/os/Handler;
+    const/4 v1, 0x0
+    if-eqz v0, :reset
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
+    :reset
+    const-wide/16 v2, 0x0
+    sput-wide v2, Lai/rplay/carcast/CnInput;->next:J
+    sput-wide v2, Lai/rplay/carcast/CnInput;->pressed:J
+    sput-wide v2, Lai/rplay/carcast/CnInput;->minimum:J
+    invoke-static {}, Lai/rplay/carcast/SettingsActivity;->g()Z
+    move-result v0
+    if-eqz v0, :done
+    const/16 v0, 0x100
+    # Release on the main queue, never inside a native session-ended callback.
+    invoke-static {v0, v1, v1, v1}, Lai/rplay/carcast/CnInput;->enqueue(IIII)V
+    :done
+    return-void
+.end method
+
 .method public run()V
     .locals 6
+    invoke-static {}, Lai/rplay/carcast/SettingsActivity;->g()Z
+    move-result v0
+    if-eqz v0, :done
     const/16 v0, 0x100
     iget v1, p0, Lai/rplay/carcast/CnInput;->buttons:I
     iget v2, p0, Lai/rplay/carcast/CnInput;->axes:I
@@ -80,5 +106,6 @@
     move-result-object v4
     const-string v5, "CnInput"
     invoke-static {v5, v4}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+    :done
     return-void
 .end method

@@ -39,6 +39,17 @@
     return-void
 .end method
 
+.method public static cancel()V
+    .locals 2
+    sget-object v0, Lai/rplay/carcast/CnSiri;->handler:Landroid/os/Handler;
+    const/4 v1, 0x0
+    if-eqz v0, :cleared
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
+    :cleared
+    sput-boolean v1, Lai/rplay/carcast/CnSiri;->active:Z
+    return-void
+.end method
+
 .method public run()V
     .locals 2
     const/16 v0, 0x100

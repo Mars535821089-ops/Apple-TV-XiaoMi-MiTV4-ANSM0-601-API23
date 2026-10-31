@@ -16,6 +16,7 @@ import urllib.request
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_LABEL = 'audit12-input-lifecycle'
 
 
 def digest(path: Path) -> str:
@@ -81,12 +82,12 @@ def main() -> int:
     parser.add_argument('--signer', type=Path)
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--unsigned', action='store_true')
-    parser.add_argument('--label', default='audit11-rebuild')
+    parser.add_argument('--label', default=DEFAULT_LABEL)
     probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label == 'audit11-rebuild':
+    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild'}:
         parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
