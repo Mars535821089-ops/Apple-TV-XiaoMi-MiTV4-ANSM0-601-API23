@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTENSIONS = {'.py', '.smali', '.patch', '.md', '.txt', '.json', '.yml', '.yaml', '.toml'}
+EXTENSIONS = {'.java', '.py', '.smali', '.patch', '.md', '.txt', '.json', '.yml', '.yaml', '.toml'}
 SPECIAL = {'.gitignore', '.gitattributes', '.python-version', '.gitmodules'}
 SECRETS = [re.compile(pattern, re.MULTILINE) for pattern in [
     r'^-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',

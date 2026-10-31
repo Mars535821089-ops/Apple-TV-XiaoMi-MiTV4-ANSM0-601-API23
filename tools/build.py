@@ -16,7 +16,7 @@ import urllib.request
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_LABEL = 'audit18-surface-ownership'
+DEFAULT_LABEL = 'audit20-reconnect-lifecycle'
 
 
 def digest(path: Path) -> str:
@@ -84,11 +84,12 @@ def main() -> int:
     parser.add_argument('--unsigned', action='store_true')
     parser.add_argument('--label', default=DEFAULT_LABEL)
     probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe',
-              'additive-dpad': 'additive_menu_probe', 'axis-nudge': 'axis_nudge_probe'}
+              'additive-dpad': 'additive_menu_probe', 'axis-nudge': 'axis_nudge_probe',
+              'spatial-focus': 'spatial_focus_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence'}:
+    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
         parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
@@ -120,7 +121,10 @@ def main() -> int:
         shutil.copy2(source, target)
     if args.input_probe:
         sys.path.insert(0, str(ROOT / 'experiments'))
-        smali_probe = importlib.import_module(probes[args.input_probe]).smali_probe
+        probe_module = importlib.import_module(probes[args.input_probe])
+        smali_probe = probe_module.smali_probe
+        if args.input_probe == 'spatial-focus':
+            probe_module.patch_helpers(decoded, args.java, apktool, args.offline)
         keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
         options = {'dpad': True} if args.input_probe == 'additive-dpad' else {}
         keys.write_text(smali_probe(keys.read_text(), **options))
@@ -137,7 +141,7 @@ def main() -> int:
     candidate = output / f'CarCast-0.3.25-{args.label}-unsigned.apk'
     run(sys.executable, work / stages[-1], '--source', work / 'CarCast-0.3.25-cn-knob-unsigned.apk',
         '--output', candidate)
-    if args.input_probe and args.input_probe != 'axis-nudge':
+    if args.input_probe and args.input_probe not in {'axis-nudge', 'spatial-focus'}:
         probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
         run(sys.executable, ROOT / 'experiments' / (probes[args.input_probe] + '.py'),
             '--source', candidate, '--output', probe,

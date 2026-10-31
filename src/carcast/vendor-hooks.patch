@@ -37,7 +37,9 @@
 +    return v0
  .end method
  
-@@ -2258,2 +2280,4 @@
+@@ -2256,4 +2278,6 @@
+     .locals 2
+ 
 +    invoke-static {}, Lai/rplay/carcast/CnInput;->cancel()V
 +
      .line 1
@@ -70,7 +72,14 @@
 +.end method
 --- a/smali/ai/rplay/carcast/CarPlayService.smali
 +++ b/smali/ai/rplay/carcast/CarPlayService.smali
-@@ -4764,4 +4764,6 @@
+@@ -4250,4 +4250,6 @@
+     .locals 6
+ 
++    invoke-static {}, Lai/rplay/carcast/CnReconnect;->cancel()V
++
+     .line 1
+     const/4 v0, 0x0
+@@ -4764,4 +4766,6 @@
  
      .line 74
 +    invoke-static {p0}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V
@@ -102,16 +111,23 @@
      .line 223
 --- a/smali/ai/rplay/carcast/NativeBridge.smali
 +++ b/smali/ai/rplay/carcast/NativeBridge.smali
-@@ -561,4 +561,9 @@
- .method public static onCarPlayEnded()V
+@@ -562,4 +562,9 @@
      .locals 3
-+
+ 
 +    invoke-static {}, Lai/rplay/carcast/CnInput;->cancel()V
 +
 +    sget-object v0, Lai/rplay/carcast/CarPlayService;->A:Lai/rplay/carcast/CarPlayService;
 +    invoke-static {v0}, Lai/rplay/carcast/CnReconnect;->start(Landroid/content/Context;)V
- 
++
      .line 1
+     invoke-static {}, Lai/rplay/carcast/FlingPlayer;->isCarPlay()Z
+@@ -1144,4 +1149,6 @@
+     :cond_1
+     const-string v2, "CarPlay connected"
++
++    invoke-static {}, Lai/rplay/carcast/CnReconnect;->cancel()V
+ 
+     .line 55
 --- a/smali/ai/rplay/carcast/SettingsActivity.smali
 +++ b/smali/ai/rplay/carcast/SettingsActivity.smali
 @@ -885,5 +885,5 @@

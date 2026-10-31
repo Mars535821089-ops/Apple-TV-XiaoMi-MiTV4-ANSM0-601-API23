@@ -35,6 +35,18 @@
     return-void
 .end method
 
+.method public static cancel()V
+    .locals 3
+    sget-object v0, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    const/4 v1, 0x0
+    sput-object v1, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    if-eqz v0, :done
+    iget-object v2, v0, Lai/rplay/carcast/CnReconnect;->handler:Landroid/os/Handler;
+    invoke-virtual {v2, v0}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
+    :done
+    return-void
+.end method
+
 .method public static remember(Landroid/content/Context;Ljava/lang/String;)V
     .locals 2
     if-eqz p1, :done
@@ -56,6 +68,8 @@
 
 .method public run()V
     .locals 9
+    sget-object v0, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    if-ne v0, p0, :done
     sget-object v0, Lai/rplay/carcast/CarPlayService;->A:Lai/rplay/carcast/CarPlayService;
     if-eqz v0, :stop
     sget-boolean v1, Lai/rplay/carcast/CarPlayService;->v:Z
@@ -136,6 +150,8 @@
     const-string v2, "Connection retry unavailable; preserving Bluetooth settings"
     invoke-static {v1, v2}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
     :later
+    sget-object v0, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    if-ne v0, p0, :done
     iget v1, p0, Lai/rplay/carcast/CnReconnect;->attempts:I
     add-int/lit8 v1, v1, 0x1
     iput v1, p0, Lai/rplay/carcast/CnReconnect;->attempts:I
@@ -149,7 +165,10 @@
     invoke-virtual {v0, p0, v2, v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
     return-void
     :stop
+    sget-object v0, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    if-ne v0, p0, :done
     const/4 v0, 0x0
     sput-object v0, Lai/rplay/carcast/CnReconnect;->task:Lai/rplay/carcast/CnReconnect;
+    :done
     return-void
 .end method

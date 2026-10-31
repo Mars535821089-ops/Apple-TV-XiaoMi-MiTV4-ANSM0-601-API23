@@ -48,3 +48,6 @@
 - CnHold原先任意方向UP都会取消当前长按，Right DOWN→Left DOWN→Right UP导致Left丢失重复；当前按keyCode匹配释放已用隔离Android实际类先红后绿验证。
 - CnRender.route原先遇slot0的null绕过current/output，导致旧SurfaceView销毁清空实际TextureView的原生窗口；真实route隔离回归验证并修正。现场旧停帧是否均由该路径引发尚无对应日志，不能扩大归因。
 - CnReconnect重试预算存在会话代次问题：第六次后120秒排队窗口中连接再断开，新start被旧task挡住，随后旧run因预算耗尽终止。需在主屏已连接时清除旧任务，并在服务销毁时取消；尚未实施，保留待修。
+
+- 有结构化deviceOfferFocus/focusTransfer通道，但只证明视区焦点移交能力，未证明控件级矩形回调或当前delegate注册；Java接口未提供控件树。不能据此宣称已存在可用全应用空间导航。
+- 原厂CarCastForceKeyFrame(0x14850c)接收有效CFLString UUID，使用当前会话发forceKeyFrame队列命令；空UUID/会话直接返回。已有Java setScreenSurface同窗口且codec有效时不触发此请求。不能传jstring/slot号代替UUID或忽略对象生命周期。Siri也未定位到证据充分的出站请求入口；能力声明及入站enhancedSiriParameters不能冒充发送接口。

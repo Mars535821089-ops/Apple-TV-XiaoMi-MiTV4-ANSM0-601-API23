@@ -29,5 +29,15 @@
     "source_repo": "https://github.com/pengchujin/aerial-tv.git",
     "source_commit": "b8e12bcf0175c8e8f6ede546d92210ff8ce5841f",
     "license": "MIT"
+  },
+  "ecj": {
+    "filename": "ecj-3.37.0.jar",
+    "url": "https://repo.maven.apache.org/maven2/org/eclipse/jdt/ecj/3.37.0/ecj-3.37.0.jar",
+    "sha256": "cde026ff966b48b5e5f148b6f041ceff3cf4f85cf75155f4ec0f40e4ee14b545"
+  },
+  "r8": {
+    "filename": "r8-8.3.37.jar",
+    "url": "https://dl.google.com/dl/android/maven2/com/android/tools/r8/8.3.37/r8-8.3.37.jar",
+    "sha256": "59753e70a74f918389cc87f1b7d66b5c0862932559167425708ded159e3de439"
   }
 }

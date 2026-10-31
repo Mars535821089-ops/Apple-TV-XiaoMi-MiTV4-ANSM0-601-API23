@@ -44,8 +44,8 @@ export TV_SERIAL='电视IP:5555'
 adb -P 5040 connect "$TV_SERIAL"
 python3 tools/device.py status
 python3 tools/device.py install \
-  --apk build/outputs/CarCast-0.3.25-audit18-surface-ownership-aligned-debugSigned.apk \
-  --receipt build/outputs/audit18-surface-ownership.json
+  --apk build/outputs/CarCast-0.3.25-audit20-reconnect-lifecycle-aligned-debugSigned.apk \
+  --receipt build/outputs/audit20-reconnect-lifecycle.json
 python3 tools/device.py launch carcast
 ```
 
@@ -95,3 +95,18 @@ python3 tools/check_public_sources.py
 `tests/run_render_routing.py`提取实际route方法，在独立Android进程用真实Surface对象、隔离原生sink验证引用。原SurfaceView销毁不得清除仍有效的TextureView输出；其他slot和没有当前TextureView的正常清理仍保留。修复前FAIL、修复后PASS，真实停帧是否均由此导致尚无充分证据。
 
 `--input-probe axis-nudge --label audit19-axis-diagnostic`只增加F2至F9的原有轴诊断，不改变原HID描述符或实体方向键。它用于在画面可更新时重新核对既有单元/满幅轴行为，不是已完成的四向修复；不进入默认版本。
+
+
+## 当前候选与空间焦点探针
+
+默认源码现为`audit20-reconnect-lifecycle`，增加新会话建立与服务停止时清理旧重试任务，以及过期回调身份保护。`tests/run_reconnect_lifecycle.py`在独立Android VM运行实际主屏回调与重连类，先FAIL后PASS；仍需真实无线反复断连验收。
+
+`--input-probe spatial-focus --label audit23-focus-probe`是独立的焦点矩形探针，不替换实体方向映射。F2/F3只发送一次前/后wheel，再处理当前TextureView现有视频的320×180临时像素数组，输出矩形、置信度和耗时；F10保留画面重建诊断。无Select、无图片落盘。超时、缺帧、全页变化或多个近似候选会失败，不宣称已实现空间导航。
+
+Java仅含自有几何和探针状态，ECJ/D8由依赖锁固定。Android胶水仍是自有Smali；编译期Host桩被明确排除设备DEX。默认版本不引入这些Java候选。验证纯算法及状态机：
+
+```sh
+python3 tests/run_focus_geometry.py --java /path/to/java
+```
+
+当前10项几何人工夹具及探针状态机检查通过；取消保护通过移除guard的故障注入检测验证。它们不代表真实视频识别、更不代表全应用遥控通过。

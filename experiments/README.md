@@ -20,3 +20,8 @@
 additive-menu的实机对照仍未通过，原wheel可用但Consumer Menu方向没有正确移动。后续`--input-probe additive-dpad --label audit14-additive-dpad`仅切换为USB-IF Generic Desktop的D-pad Up/Down/Right/Left（0x90..0x93），同样保留原字段，报告32bit、描述符78字节；F2/F3/F4/F5仍按上/下/左/右排列。构建及4项分配复制验证通过，尚待实机。标准来源：https://www.usb.org/sites/default/files/hut1_12.pdf 。
 
 实机结论：additive-dpad同样未通过，普通wheel有效时，新增方向未产生预期空间移动。与Consumer Menu路线一并拒绝作为最终四向方案。有效的输入生命周期修复保留在默认audit12中。
+
+
+`axis_nudge_probe.py`只使用既有X/Y，不改HID描述符。真实画面确认：网格满幅Y可上下同列，设置列表却首项跳末项，单位轴不动，因此仍失败。F10只作Activity.recreate诊断，不能把它当长期停帧修复。
+
+`spatial_focus_probe.py`与`spatial-focus/`是新的可否定焦点几何探针。自有Java只处理数组/异步状态，自有Smali读取接收器现有视频纹理，所有像素只在内存，日志仅矩形与计数。F2/F3一次wheel、不发送Select；F10只重建画面。audit23真实图标确实移动，但前/后探针都未稳定输出矩形，判失败；audit24增加计数指标以定位原因。人工图形夹具通过不等于真实识别通过。默认构建仍不采用该方案。

@@ -84,3 +84,13 @@
 - 用户要求再次实测上下：audit18网格电话处按Down实际横移到音乐，按Up横移回电话，报告分别wheel+1/-1。四向仍失败。为排除旧帧对先前原轴观察的干扰，仅用原HID既有X/Y做一次单元/满幅对照，不更换Usage或描述符；audit19-axis-diagnostic已安装核对，SHA256 e4a059f906b958583b31e2f554a4454bd9e145131c52d4e27d25df127a5a99e1。当前测试结果待记录，默认仍audit18。
 - 实机Aerial来源发生漂移：发现当前版本1.74/code94、最后更新时间2026-10-31 12:02:33；安装包SHA256 6faea5a357b5036f3d0bab2454df795f433bd54c0a754a7e9d4569648ed2306a与官方v1.74 standard发布资产一致。变化原因未确认；本轮没有执行Aerial升级。为对应现用版本，源码子模块固定到官方v1.74提交3094d55c7ba17818974a4e51cb793e3cf4ddb486，依赖锁保留旧1.72元数据。
 - 当前整体估算58%，仅因真实画面更新与输入边界回归推进；空间四向、全部应用、Siri、完整重连、声音、最终ADB仍未完成。
+
+- 19原轴对照已有可靠真实画面证据：网格满幅Y可上下同列，但设置首项驾驶专注模式一按满幅Down直达末项无障碍，单位Up仍不动。再次拒绝原轴作为全应用方案，不继续盲调幅度。
+- audit20-reconnect-lifecycle已构建，SHA256 0955f6a6c99b73e1f518bd423e3d21f268f1b6a3628b36e4a49f515101dcc5d5。真实main-screen回调取消旧task、服务销毁取消、run身份保护，实际类和回调在Android隔离VM先FAIL后PASS。21项宿主及3项输入隔离回归保持通过。未单独部署20。
+- audit21视频重建诊断包含20修复并已安装核对，SHA256 38addfbbf54ca62a6ce5746d21d667dbd64d9cc9e9b2c35e7daf8ac3e9670c30。F10 Activity.recreate保持PID9215，窗口和TextureView重建；受监控的这一段未出现session disconnected，随后出现新帧。长时仍有停帧/后来自行恢复记录，不能称停帧根因全修，也未将重建自动加入观察器。
+- 用户要求继续并指出卡住：后续继续自主推进，不将状态回答作为停止点。原生轴路线不够，启动按现有视频流焦点几何的可否定探针设计；用户已明确全权处理并退出反复问答，按技能例外自主选择实现路线。新设计经独立builder check无关键缺口，结论仅覆盖探针。
+- 纯Java几何算法10项人工夹具由空实现FAIL到PASS；异步探针fresh-frame、重复请求、超时、取消及缺帧合同通过，并注入移除guard的变异证明取消回归会FAIL。ECJ3.37.0/R8 8.3.37固定官方来源和SHA256，编译期自有Host桩严格排除设备DEX，不下载整套Android SDK。
+- audit23-focus-probe构建完成，SHA256 7070765b389a4a4b7400228b3e79e55d4aa95b2b5677ffbf3283b44399c8bb06，正进行一次保留数据部署，尚未核对完成。仅F2/F3执行一次wheel前后内存取样并输出矩形，无Select、无截图文件、默认实体方向暂不改。不得将探针安装或人工测试当成方向适配通过。
+
+- audit23已安装并核对7070765b候选，API23无类验证崩溃。真实网格F2焦点电话→音乐，F3反向回电话，但两次均输出no stable focus，按失败处理。继续用计数/矩形文本区分取样、帧稳定性和检测阈值，不保存像素或图片。
+- audit24-focus-metrics构建通过，SHA256 d67ef0f2b3b94bcb6b015b7c458039fd504af8d5ce594d72cee50fff23caa05a；正发起一次覆盖安装，结果待核对。source当前geometry统计增加changed/best/second/bounds/fill，仅日志数字；所有像素仍临时内存。独立Android重连和Surface回归再次通过。
