@@ -123,3 +123,5 @@ python3 tests/run_focus_geometry.py --java /path/to/java
 后续默认`audit38-render-generation`补齐空窗：由弱引用记录最近挂载的显示实例，current清空后只有该实例能重新绑定；每次挂载、绑定和销毁推进显示代次。实验观察器使用代次验证缓存，显示替换时取消旧观察。实际Surface回调隔离用例覆盖旧A→新B→current空→旧A迟到→B再进入；完整设备稳定性仍待验收。
 
 Native video diagnostics remain opt-in: `--video-probe return-status` records ignored codec return values; `--video-probe first-poll-wait-return-status` adds a controlled5000us first output poll, while later polls remain0. Both require a unique diagnostic label and preserve the default baseline. Each native stub is validated with relocated Thumb emulation before signing; device acceptance is separate. Current real-device evidence and limitations are in progress.md. No decoder timing experiment is a completed compatibility claim.
+
+`--wheel-probe delta-only` is a separate spatial-input contrast: pure relative-wheel motion sends one delta; button and axis releases remain intact. `tests/run_wheel_delta.py` runs actual API23 queue/send code against an isolated sink. Light-appearance focus polarity now has synthetic coverage; device theme, scrolling, pagination, complete controls and long-term reliability remain unaccepted.

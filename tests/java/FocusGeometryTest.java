@@ -61,6 +61,12 @@ public final class FocusGeometryTest {
         cases++;
         for(int y=80;y<92;y++)for(int x=172;x<184;x++)b[y*W+x]=DARK;
         none(a,b,"incomplete circular highlight is not a confirmed focus ring");
+        a=new int[W*H];b=new int[W*H];Arrays.fill(a,LIGHT);Arrays.fill(b,LIGHT);
+        box(a,80,40,250,62,DARK);box(b,80,80,250,102,DARK);
+        rect(a,b,"light appearance adjacent rows");
+        box(b,100,87,140,94,0xfffafafa);rect(a,b,"light appearance selected-row text holes");
+        box(a,260,15,310,65,0xff101010);box(b,260,15,310,65,0xff101010);
+        rect(a,b,"unchanged dark icon in light appearance");
         System.out.println("PASS: "+cases+" focus geometry cases");
     }
 }

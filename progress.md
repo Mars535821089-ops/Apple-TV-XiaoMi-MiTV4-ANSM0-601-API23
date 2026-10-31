@@ -144,3 +144,13 @@ Controlled audit41 built73b300ba63ef119efcbe784b03420bf61f2a197bd710489a050e0b2c
 Return telemetry and first-poll wait are separate opt-in build modes with baseline-label protection. Both were independently reviewed; no definite ABI/stack/tail-branch defect found. Return telemetry12 emulation cases, first-wait6 cases including original-loop secondpoll0 passed. The first-wait hook affects initial drain entry only, including error-drain entry, not every output-loop iteration. It is not an independent asynchronous pump and cannot guarantee outputs completing after5ms.
 
 Controlled audit41 one-time installation now pending; verify receipt before any retry. No live41 performance or reliability acceptance yet. Default38 and no-wait spatial39 remain available. Full project stays incomplete58%, audio/finalADB deferred.
+
+## audit41 first-poll contrast: not accepted
+
+Installed/verified73b300ba63ef119efcbe784b03420bf61f2a197bd710489a050e0b2caa9449a8, PID27280. Initial Home changed dashboard to grid, but DOWN Phone->Music1460ms then next forward observation failed after7s (total8621ms). Native queue/release3311/3300 returns all0 in this captured period. At21:39:49 there were9 queue/10 release, then50-57 no calls;58 had1/1,59 had17/17. Thus the bounded5ms first-poll experiment has NOT established a complete tail-frame/stall fix. Keep it out of defaults. Continue investigating report transport and native frame arrival; do not simply keep raising timeouts or mark spatial navigation complete.
+
+## audit42 delta-only and separate telephony failure
+
+Added light-appearance polarity handling: original geometry selected the old row in a synthetic light UI; now17 geometry fixtures and all probe/path/generation contracts pass. This is not light-theme hardware acceptance. Relative Wheel descriptor is Data/Variable/Relative; known sender copies bytes and visible queues do not deduplicate. Delta-only opt-in removed only its redundant zero report. Actual API23 Host.send/CnInput isolated test failed with2 reports before, passes with1 plus preserved normal cancellation neutral afterward.
+
+audit42 installed/verified8e2b960dbc08298284a69a92164029ef36d465c8b37bfe50f40d8d9a932ee31c, PID28307. Initial Right still timed out (baseline38 frames unchanged), so delta-only is not a demonstrated initial-freeze fix. F10 recreated output, then a separate new MainAudio(100) telephony request negotiated0x40000000/Opus48k at80ms and failed38/0x26; SDK tore down the session. No real phone call was initiated by our tests. This connection-breaking audio-format path is now being traced, preserving media AAC102 and all required user functions. Audio subjective acceptance remains deferred.

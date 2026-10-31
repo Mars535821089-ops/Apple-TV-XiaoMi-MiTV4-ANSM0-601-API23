@@ -90,8 +90,11 @@ def main() -> int:
                         help='Unverified diagnostic; requires a separate --label')
     parser.add_argument('--video-probe', choices=['return-status','first-poll-wait','first-poll-wait-return-status'],
                         help='Codec return telemetry only; requires a separate --label')
+    parser.add_argument('--wheel-probe', choices=['delta-only'],help='Relative wheel without redundant zero report; spatial probe only')
     args = parser.parse_args()
-    if (args.input_probe or args.video_probe) and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
+    if args.wheel_probe and args.input_probe not in {'spatial-focus','spatial-navigation'}:
+        parser.error('Wheel probe requires a separate spatial input probe')
+    if (args.input_probe or args.video_probe or args.wheel_probe) and args.label in {DEFAULT_LABEL, 'audit36-current-surface', 'audit20-reconnect-lifecycle', 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence', 'audit18-surface-ownership'}:
         parser.error('Probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
@@ -126,7 +129,7 @@ def main() -> int:
         probe_module = importlib.import_module(probes[args.input_probe])
         smali_probe = probe_module.smali_probe
         if args.input_probe in {'spatial-focus', 'spatial-navigation'}:
-            probe_module.patch_helpers(decoded, args.java, apktool, args.offline)
+            probe_module.patch_helpers(decoded, args.java, apktool, args.offline,delta_only=args.wheel_probe=='delta-only')
         keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
         options = {'dpad': True} if args.input_probe == 'additive-dpad' else {}
         if args.input_probe == 'spatial-navigation': options={'spatial':True}
@@ -169,6 +172,7 @@ def main() -> int:
     receipt = {'label': args.label, 'apk': final.name, 'sha256': digest(final),
                'input_probe': args.input_probe,
                'video_probe': args.video_probe,
+               'wheel_probe': args.wheel_probe,
                'upstream_sha256': digest(upstream), 'resources_preserved': resources,
                'original_audio_capabilities': True, 'device_acceptance': 'not implied by build'}
     (output / f'{args.label}.json').write_text(json.dumps(receipt, indent=2) + '\n')

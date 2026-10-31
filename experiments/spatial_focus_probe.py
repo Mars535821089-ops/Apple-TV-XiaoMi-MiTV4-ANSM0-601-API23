@@ -109,7 +109,7 @@ def smali_probe(source, spatial=False):
     return source.replace(anchor,prefix+anchor)
 
 
-def patch_helpers(decoded, java, apktool, offline):
+def patch_helpers(decoded, java, apktool, offline, delta_only=False):
     from compile_focus import compile_focus
     generated=compile_focus(java,apktool,decoded,offline)
     for source in generated.rglob('*.smali'):
@@ -117,6 +117,11 @@ def patch_helpers(decoded, java, apktool, offline):
         target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     host=decoded/'smali/ai/rplay/carcast/CnProbeHost.smali'
     shutil.copy2(ROOT/'experiments/spatial-focus/CnProbeHost.smali',host)
+    if delta_only:
+        text=host.read_text()
+        neutral=' invoke-static {p1,v1,v1,v1},Lai/rplay/carcast/CnInput;->enqueue(IIII)V\n'
+        if text.count(neutral)!=1:raise ValueError('Unexpected wheel neutral baseline')
+        host.write_text(text.replace(neutral,' # Relative wheel is one delta; button/axis releases remain in CnInput.\n'))
     render=decoded/'smali/ai/rplay/carcast/CnRender.smali'
     render.write_text(render.read_text()+(ROOT/'experiments/spatial-focus/render-capture.smali').read_text())
     source=decoded/'smali/ai/rplay/carcast/CnInput.smali'

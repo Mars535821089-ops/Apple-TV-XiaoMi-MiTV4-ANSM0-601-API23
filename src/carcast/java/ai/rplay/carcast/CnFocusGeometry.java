@@ -32,14 +32,22 @@ public final class CnFocusGeometry {
         if(before==null || after==null || width<40 || height<30 || width>640 || height>360
                 || before.length!=width*height || after.length!=before.length) return null;
         int left=width/10, changed=0, area=(width-left)*height, maskCount=0;
+        int paperBefore=0,paperAfter=0;
+        for(int y=0;y<height;y++)for(int x=left;x<width;x++) {
+            int i=y*width+x;
+            if(paper(before[i]))paperBefore++;
+            if(paper(after[i]))paperAfter++;
+        }
+        boolean lightTheme=paperBefore*100L>area*60L && paperAfter*100L>area*60L;
         byte[] mask=new byte[before.length];
         for(int y=0;y<height;y++) for(int x=left;x<width;x++) {
             int i=y*width+x, old=luma(before[i]), now=luma(after[i]);
             if(Math.abs(now-old)>=28) changed++;
             int c=after[i], r=(c>>>16)&255, g=(c>>>8)&255, b=c&255;
             int spread=Math.max(r,Math.max(g,b))-Math.min(r,Math.min(g,b));
-            if(stats!=null && stats.length>=24 && (c>>>24)>=128 && now-old>=20 && spread<=40) stats[16+Math.min(7,now/32)]++;
-            if((c>>>24)>=128 && now>=130 && now-old>=35 && spread<=40) {mask[i]=1;maskCount++;}
+            int delta=lightTheme?old-now:now-old;
+            if(stats!=null && stats.length>=24 && (c>>>24)>=128 && delta>=20 && spread<=40) stats[16+Math.min(7,now/32)]++;
+            if((c>>>24)>=128 && (lightTheme?now<=110:now>=130) && delta>=35 && spread<=40) {mask[i]=1;maskCount++;}
         }
         if(stats!=null) { stats[0]=changed; if(stats.length>=16) stats[8]=maskCount; }
         if(changed<16 || changed*100L>area*45L) return null;
@@ -98,5 +106,10 @@ public final class CnFocusGeometry {
         if(stats!=null) { stats[1]=best;stats[2]=second;stats[3]=bestL;stats[4]=bestT;stats[5]=bestR;stats[6]=bestB;stats[7]=bestFill; }
         if(best==0 || second*100L>=best*70L) return null;
         return new int[]{bestL,bestT,bestR,bestB,bestFill,changed};
+    }
+    private static boolean paper(int c) {
+        int r=(c>>>16)&255,g=(c>>>8)&255,b=c&255;
+        return (c>>>24)>=128 && luma(c)>=180
+            && Math.max(r,Math.max(g,b))-Math.min(r,Math.min(g,b))<=40;
     }
 }
