@@ -16,7 +16,7 @@ import urllib.request
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_LABEL = 'audit12-input-lifecycle'
+DEFAULT_LABEL = 'audit15-no-legacy-cursor'
 
 
 def digest(path: Path) -> str:
@@ -83,11 +83,12 @@ def main() -> int:
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--unsigned', action='store_true')
     parser.add_argument('--label', default=DEFAULT_LABEL)
-    probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe'}
+    probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe',
+              'additive-dpad': 'additive_menu_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild'}:
+    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle'}:
         parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
@@ -121,7 +122,8 @@ def main() -> int:
         sys.path.insert(0, str(ROOT / 'experiments'))
         smali_probe = importlib.import_module(probes[args.input_probe]).smali_probe
         keys = decoded / 'smali/ai/rplay/carcast/CnKeys.smali'
-        keys.write_text(smali_probe(keys.read_text()))
+        options = {'dpad': True} if args.input_probe == 'additive-dpad' else {}
+        keys.write_text(smali_probe(keys.read_text(), **options))
     raw = work / 'CarCast-0.3.25-cn-unsigned.apk'
     run(args.java, '-jar', apktool, 'b', decoded, '-o', raw)
     stages = ['assemble_carcast_cn.py', 'fix_carcast_arm_alignment.py',
@@ -138,7 +140,8 @@ def main() -> int:
     if args.input_probe:
         probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
         run(sys.executable, ROOT / 'experiments' / (probes[args.input_probe] + '.py'),
-            '--source', candidate, '--output', probe)
+            '--source', candidate, '--output', probe,
+            *(['--dpad'] if args.input_probe == 'additive-dpad' else []))
         probe.replace(candidate)
     resources = verify_resources(upstream, candidate)
     final = candidate

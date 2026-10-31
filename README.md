@@ -44,8 +44,8 @@ export TV_SERIAL='电视IP:5555'
 adb -P 5040 connect "$TV_SERIAL"
 python3 tools/device.py status
 python3 tools/device.py install \
-  --apk build/outputs/CarCast-0.3.25-audit12-input-lifecycle-aligned-debugSigned.apk \
-  --receipt build/outputs/audit12-input-lifecycle.json
+  --apk build/outputs/CarCast-0.3.25-audit15-no-legacy-cursor-aligned-debugSigned.apk \
+  --receipt build/outputs/audit15-no-legacy-cursor.json
 python3 tools/device.py launch carcast
 ```
 
@@ -76,6 +76,6 @@ python3 tools/check_public_sources.py
 
 ## 输入生命周期回归
 
-当前默认构建标签为`audit12-input-lifecycle`，修复退到后台、失去焦点及会话结束时的长按/排队输入清理；四向空间导航仍未完成。audit11历史回退包保留，不覆盖其文件。声音与ADB最终验收按用户安排留到其他兼容项完成后。
+当前默认构建标签为`audit15-no-legacy-cursor`，删除未使用的旧光标入口并保留audit12的输入生命周期修复；新候选尚未安装验收。audit12已完成长按相关实测，修复退到后台、失去焦点及会话结束时的长按/排队输入清理；四向空间导航仍未完成。audit11历史回退包保留，不覆盖其文件。声音与ADB最终验收按用户安排留到其他兼容项完成后。
 
 `tests/run_input_lifecycle.py`在电视独立shell进程运行实际输入辅助类和构建产物中的onPause方法，使用真实Android Looper/Handler/Activity；只有会话标志和原生报告接收端被隔离替身替代，不安装应用，也不向手机发送按键。两个回归分别验证长按任务和排队按键在onPause之后不再产生非中立报告，修复前都失败、修复后都通过。它不代替真实应用长按、方向或跨应用验收。
