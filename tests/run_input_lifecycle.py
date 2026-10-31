@@ -39,8 +39,10 @@ SESSION = '''.field public static connected:Z
 .end method
 '''
 SINK = '''.field public static reports:I
+.field public static lastWheel:I
 .method public static iapPointer(IIII)V
  .locals 1
+ sput p3, Lai/rplay/carcast/NativeBridge;->lastWheel:I
  or-int v0, p1, p2
  or-int/2addr v0, p3
  if-eqz v0, :done
@@ -79,18 +81,18 @@ MAIN = '''.field public static activity:Lai/rplay/carcast/CarPlayActivity;
  new-instance v1, Lai/rplay/carcast/InputLifecycleStep;
  const/4 v2, 0x0
  invoke-direct {v1,v2}, Lai/rplay/carcast/InputLifecycleStep;-><init>(I)V
- const-wide/16 v2, 0x2bc
+ const-wide/16 v2, 0x190
  invoke-virtual {v0,v1,v2,v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
  :timers
  new-instance v1, Lai/rplay/carcast/InputLifecycleStep;
  const/4 v2, 0x1
  invoke-direct {v1,v2}, Lai/rplay/carcast/InputLifecycleStep;-><init>(I)V
- const-wide/16 v2, 0x2ee
+ const-wide/16 v2, 0x384
  invoke-virtual {v0,v1,v2,v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
  new-instance v1, Lai/rplay/carcast/InputLifecycleStep;
  const/4 v2, 0x2
  invoke-direct {v1,v2}, Lai/rplay/carcast/InputLifecycleStep;-><init>(I)V
- const-wide/16 v2, 0x5dc
+ const-wide/16 v2, 0x6a4
  invoke-virtual {v0,v1,v2,v3}, Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
  invoke-static {}, Landroid/os/Looper;->loop()V
  return-void
@@ -153,6 +155,89 @@ STEP = '''.implements Ljava/lang/Runnable;
 '''
 
 
+OVERLAP_MAIN = '''.method public static main([Ljava/lang/String;)V
+ .locals 5
+ invoke-static {}, Landroid/os/Looper;->prepareMainLooper()V
+ const/4 v0, 0x1
+ sput-boolean v0,Lai/rplay/carcast/SettingsActivity;->connected:Z
+ const/16 v0,0x16
+ const/4 v1,0x0
+ invoke-static {v0,v1},Lai/rplay/carcast/CnHold;->update(II)V
+ new-instance v0,Landroid/os/Handler;
+ invoke-static {},Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
+ move-result-object v1
+ invoke-direct {v0,v1},Landroid/os/Handler;-><init>(Landroid/os/Looper;)V
+ new-instance v1,Lai/rplay/carcast/InputOverlapStep;
+ const/4 v2,0x0
+ invoke-direct {v1,v2},Lai/rplay/carcast/InputOverlapStep;-><init>(I)V
+ const-wide/16 v2,0xfa
+ invoke-virtual {v0,v1,v2,v3},Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
+ new-instance v1,Lai/rplay/carcast/InputOverlapStep;
+ const/4 v2,0x1
+ invoke-direct {v1,v2},Lai/rplay/carcast/InputOverlapStep;-><init>(I)V
+ const-wide/16 v2,0x3b6
+ invoke-virtual {v0,v1,v2,v3},Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
+ new-instance v1,Lai/rplay/carcast/InputOverlapStep;
+ const/4 v2,0x2
+ invoke-direct {v1,v2},Lai/rplay/carcast/InputOverlapStep;-><init>(I)V
+ const-wide/16 v2,0x578
+ invoke-virtual {v0,v1,v2,v3},Landroid/os/Handler;->postDelayed(Ljava/lang/Runnable;J)Z
+ invoke-static {},Landroid/os/Looper;->loop()V
+ return-void
+.end method
+'''
+OVERLAP_STEP = '''.implements Ljava/lang/Runnable;
+.field private stage:I
+.field private static atRelease:I
+.method public constructor <init>(I)V
+ .locals 0
+ invoke-direct {p0},Ljava/lang/Object;-><init>()V
+ iput p1,p0,Lai/rplay/carcast/InputOverlapStep;->stage:I
+ return-void
+.end method
+.method public run()V
+ .locals 5
+ iget v0,p0,Lai/rplay/carcast/InputOverlapStep;->stage:I
+ if-nez v0,:check
+ const/16 v0,0x15
+ const/4 v1,0x0
+ invoke-static {v0,v1},Lai/rplay/carcast/CnHold;->update(II)V
+ const/16 v0,0x16
+ const/4 v1,0x1
+ invoke-static {v0,v1},Lai/rplay/carcast/CnHold;->update(II)V
+ return-void
+ :check
+ sget-object v4,Ljava/lang/System;->out:Ljava/io/PrintStream;
+ sget v1,Lai/rplay/carcast/NativeBridge;->reports:I
+ const/4 v2,0x1
+ if-ne v0,v2,:released
+ if-eqz v1,:failed
+ sget v2,Lai/rplay/carcast/NativeBridge;->lastWheel:I
+ const/4 v3,-0x1
+ if-ne v2,v3,:failed
+ sput v1,Lai/rplay/carcast/InputOverlapStep;->atRelease:I
+ const/16 v0,0x15
+ const/4 v1,0x1
+ invoke-static {v0,v1},Lai/rplay/carcast/CnHold;->update(II)V
+ return-void
+ :released
+ sget v2,Lai/rplay/carcast/InputOverlapStep;->atRelease:I
+ if-ne v1,v2,:failed
+ const-string v0,"PASS: unrelated key release preserves the held direction; matching release stops it"
+ invoke-virtual {v4,v0},Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+ const/4 v0,0x0
+ invoke-static {v0},Ljava/lang/System;->exit(I)V
+ return-void
+ :failed
+ const-string v0,"FAIL: overlapping direction release cancelled or failed to stop the current hold"
+ invoke-virtual {v4,v0},Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+ const/4 v0,0x1
+ invoke-static {v0},Ljava/lang/System;->exit(I)V
+ return-void
+.end method
+'''
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', required=True)
@@ -182,6 +267,8 @@ def main():
         'NativeBridge': ('Ljava/lang/Object;', SINK),
         'InputLifecycleMain': ('Ljava/lang/Object;', MAIN),
         'InputLifecycleStep': ('Ljava/lang/Object;', STEP),
+        'InputOverlapMain': ('Ljava/lang/Object;', OVERLAP_MAIN),
+        'InputOverlapStep': ('Ljava/lang/Object;', OVERLAP_STEP),
     }
     for name, (parent, body) in classes.items():
         (package / f'{name}.smali').write_text(HEADER.format(name=name, superclass=parent) + body)
@@ -194,9 +281,10 @@ def main():
     remote = '/data/local/tmp/carcast-input-lifecycle-test.dex'
     tv.run('push', str(dex), remote, timeout=30)
     failed = False
-    for scenario in ('hold', 'queue'):
+    for scenario in ('hold', 'queue', 'overlap'):
+        main_class = 'ai.rplay.carcast.InputOverlapMain' if scenario == 'overlap' else 'ai.rplay.carcast.InputLifecycleMain'
         result = subprocess.run(tv.prefix + ['shell', 'env', 'CLASSPATH=' + remote, 'app_process', '/',
-                                             'ai.rplay.carcast.InputLifecycleMain', scenario],
+                                             main_class, scenario],
                                 capture_output=True, text=True, timeout=15)
         print(scenario + ': ' + result.stdout.strip(), flush=True)
         if result.stderr:

@@ -76,3 +76,11 @@
 - audit16-observe-frame-silence构建完成，SHA256 eecbe2e5ecf97aa5d4a1d26afa2caea3531c4414828739f53cc89f764417debb；568项原资源、581项非DEX原始条目保留，ARM32对齐32例、桥接30例、HID复制4例、v1/v2/v3签名通过。未安装，仍须真实会话验收。空间四向继续保留失败状态，整体进度仍57%。
 
 - 用户重新开启ADB后，短暂读取到新启动及Aerial前台；audit12只读核对明确不匹配，所以此前回退未能确认。随后发起一次audit16覆盖请求，普通预览仅见Aerial，无本次安装确认框。安装过程中调试再次离线；没有字节核对结果，audit16也不能称已安装。专用连接重建仍无响应；已仅停止失联的本机安装客户端，不重复安装，当前设备版本未知。
+
+- 用户进一步确认ADB开机“允许”稍后变“拒绝”，该项明确失败，不把此前默认开启反馈视为持久性通过。恢复后已用桌面现有ConfigReceiver启用keep_adb，回执keep_adb=true、adb_enabled=1；这是保持施工连接，最终重启验收仍最后。
+- 只读核对证实此前audit16实际上已安装，SHA256与eecbe2e5回执一致，无须重复安装。新增实际Android交叠方向回归先FAIL；修复CnHold仅匹配当前方向键释放后，hold/queue/overlap三项PASS。排队夹具首次因类加载未产生输入报ERROR，已增加冷启动余量，再运行原实现得到正确overlap FAIL后修复。
+- 发现Surface所有权缺陷：原SurfaceView销毁经route(0,null)错误清除活跃TextureView输出。提取实际route、用真实Android Surface与隔离native sink先FAIL后PASS；保留其他slot与真正TextureView销毁的原行为。日志过滤同步保留脱敏surface证据，新增边界先FAIL再PASS，完整21项通过。
+- audit18-surface-ownership SHA256 ba390c3c9c39b8c166b32f0390f578a08f3168aabe73ef9583ee07ada3786c51已覆盖安装并核对设备字节。无线会话恢复后frames从111增至564、持续超过150秒更新；这只证明本轮画面有更新，不能把先前所有停帧都归因于已修路由，也不代表长期稳定通过。
+- 用户要求再次实测上下：audit18网格电话处按Down实际横移到音乐，按Up横移回电话，报告分别wheel+1/-1。四向仍失败。为排除旧帧对先前原轴观察的干扰，仅用原HID既有X/Y做一次单元/满幅对照，不更换Usage或描述符；audit19-axis-diagnostic已安装核对，SHA256 e4a059f906b958583b31e2f554a4454bd9e145131c52d4e27d25df127a5a99e1。当前测试结果待记录，默认仍audit18。
+- 实机Aerial来源发生漂移：发现当前版本1.74/code94、最后更新时间2026-10-31 12:02:33；安装包SHA256 6faea5a357b5036f3d0bab2454df795f433bd54c0a754a7e9d4569648ed2306a与官方v1.74 standard发布资产一致。变化原因未确认；本轮没有执行Aerial升级。为对应现用版本，源码子模块固定到官方v1.74提交3094d55c7ba17818974a4e51cb793e3cf4ddb486，依赖锁保留旧1.72元数据。
+- 当前整体估算58%，仅因真实画面更新与输入边界回归推进；空间四向、全部应用、Siri、完整重连、声音、最终ADB仍未完成。

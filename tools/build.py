@@ -16,7 +16,7 @@ import urllib.request
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_LABEL = 'audit16-observe-frame-silence'
+DEFAULT_LABEL = 'audit18-surface-ownership'
 
 
 def digest(path: Path) -> str:
@@ -84,11 +84,11 @@ def main() -> int:
     parser.add_argument('--unsigned', action='store_true')
     parser.add_argument('--label', default=DEFAULT_LABEL)
     probes = {'consumer-menu': 'consumer_menu_probe', 'additive-menu': 'additive_menu_probe',
-              'additive-dpad': 'additive_menu_probe'}
+              'additive-dpad': 'additive_menu_probe', 'axis-nudge': 'axis_nudge_probe'}
     parser.add_argument('--input-probe', choices=probes,
                         help='Unverified diagnostic; requires a separate --label')
     args = parser.parse_args()
-    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor'}:
+    if args.input_probe and args.label in {DEFAULT_LABEL, 'audit11-rebuild', 'audit12-input-lifecycle', 'audit15-no-legacy-cursor', 'audit16-observe-frame-silence'}:
         parser.error('Input probes need a separate --label; keep the baseline output')
     if not args.label or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in args.label):
         parser.error('--label accepts only letters, digits, hyphens and underscores')
@@ -137,7 +137,7 @@ def main() -> int:
     candidate = output / f'CarCast-0.3.25-{args.label}-unsigned.apk'
     run(sys.executable, work / stages[-1], '--source', work / 'CarCast-0.3.25-cn-knob-unsigned.apk',
         '--output', candidate)
-    if args.input_probe:
+    if args.input_probe and args.input_probe != 'axis-nudge':
         probe = output / f'CarCast-0.3.25-{args.label}-probe.apk'
         run(sys.executable, ROOT / 'experiments' / (probes[args.input_probe] + '.py'),
             '--source', candidate, '--output', probe,

@@ -64,7 +64,8 @@
 .method public static route(ILandroid/view/Surface;)V
     .locals 1
     if-nez p0, :native
-    if-eqz p1, :native
+    # Legacy SurfaceView release must not detach the active TextureView.
+    # The texture destruction callback owns its native detach and release.
     sget-object v0, Lai/rplay/carcast/CnRender;->current:Lai/rplay/carcast/CnRender;
     if-eqz v0, :native
     sget-object p1, Lai/rplay/carcast/CnRender;->output:Landroid/view/Surface;

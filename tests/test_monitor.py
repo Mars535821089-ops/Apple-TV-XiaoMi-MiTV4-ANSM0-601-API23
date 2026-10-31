@@ -15,6 +15,10 @@ class MonitorPrivacyTests(unittest.TestCase):
         self.assertNotIn('192.0.2.10', result)
         self.assertNotIn('AA:BB:CC:DD:EE:FF', result)
 
+    def test_surface_detach_evidence_is_preserved_without_peer_identity(self):
+        self.assertEqual(monitor.redact('CarCast slot 0: surface gone peer=192.0.2.10'),
+                         'CarCast slot 0: surface gone peer=<address>')
+
     def test_secret_line_is_dropped_even_when_audio_keyword_matches(self):
         self.assertIsNone(monitor.redact('CarCast audioType: media passphrase=example-private-value'))
 

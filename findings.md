@@ -44,3 +44,7 @@
 - 发现另一处可定位的主动断连：已有安装版日志在TextureView累计5帧、frameAgeMs=149683时输出“Visible CarPlay video stalled”，随后screen stop和session disconnected，再约15秒后重连。该顺序证明监视器主动拆断会话，不能据此认定真实链路已经失效，也不是所有点击退出的统一根因。
 - audit16将画面监视器限制为记录，不再根据帧回调静默执行teardownSession或CnReconnect.start；SDK onCarPlayEnded既有重连路径保留。静态安全边界先红后绿、完整20项测试通过；候选未安装，静止画面、真正断线及跨应用恢复仍待实机。
 - 四向协议研究现阶段仍未突破：原旋钮轴/步进、Consumer Menu及Generic Desktop D-pad均未达到需求。标准字段存在不等于iPhone接受，禁止继续把更多未经证明的Usage数值当修复方案。原厂primaryInputDevice与HID设备构造已定位，尚未证明存在可用的新空间导航入口。
+
+- CnHold原先任意方向UP都会取消当前长按，Right DOWN→Left DOWN→Right UP导致Left丢失重复；当前按keyCode匹配释放已用隔离Android实际类先红后绿验证。
+- CnRender.route原先遇slot0的null绕过current/output，导致旧SurfaceView销毁清空实际TextureView的原生窗口；真实route隔离回归验证并修正。现场旧停帧是否均由该路径引发尚无对应日志，不能扩大归因。
+- CnReconnect重试预算存在会话代次问题：第六次后120秒排队窗口中连接再断开，新start被旧task挡住，随后旧run因预算耗尽终止。需在主屏已连接时清除旧任务，并在服务销毁时取消；尚未实施，保留待修。

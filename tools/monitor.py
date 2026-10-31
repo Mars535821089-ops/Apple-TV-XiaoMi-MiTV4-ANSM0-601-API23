@@ -11,7 +11,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 KEEP = re.compile(r'CnInput|CnRender|CnReconnect|CnSiri|CnFrameHealth|CarPlay session|'
-                  r'screen (?:start|stop) slot|audio (?:setup|torn)|AudioStream|AudioTrack|'
+                  r'screen (?:start|stop) slot|slot [0-9]+: surface |no surface yet|waiting for surface|audio (?:setup|torn)|AudioStream|AudioTrack|'
                   r'Main(?:High)?Audio|audioFormat|audioType|audioLatencyMs|latencyMs|'
                   r'latencyMin|latencyMax|preferredLatency|outputLatencyMicros|inputLatencyMicros|'
                   r'Setup session failed|Fatal signal|FATAL EXCEPTION|underrun|underflow|'

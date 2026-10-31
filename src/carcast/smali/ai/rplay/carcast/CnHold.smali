@@ -4,6 +4,7 @@
 .field private static handler:Landroid/os/Handler;
 .field private static active:Lai/rplay/carcast/CnHold;
 .field private direction:I
+.field private keyCode:I
 
 .method public constructor <init>(I)V
     .locals 0
@@ -28,6 +29,11 @@
     :ready
     sget-object v1, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;
     if-eqz v1, :create
+    # A late release from the previous direction must not cancel the new one.
+    if-eqz p1, :replace
+    iget v2, v1, Lai/rplay/carcast/CnHold;->keyCode:I
+    if-ne p0, v2, :done
+    :replace
     invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacks(Ljava/lang/Runnable;)V
     :create
     const/4 v1, 0x0
@@ -43,6 +49,7 @@
     :new
     new-instance v2, Lai/rplay/carcast/CnHold;
     invoke-direct {v2, v1}, Lai/rplay/carcast/CnHold;-><init>(I)V
+    iput p0, v2, Lai/rplay/carcast/CnHold;->keyCode:I
     sput-object v2, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;
     const-wide/16 v1, 0x258
     sget-object v3, Lai/rplay/carcast/CnHold;->active:Lai/rplay/carcast/CnHold;
